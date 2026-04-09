@@ -1,6 +1,4 @@
-Python 102 for Scientific Computing and Data Analysis
------------------------------------------------------
+py-onramp
+---------
 
-<https://python-102.readthedocs.io>
-
-[![Documentation Status](https://readthedocs.org/projects/python-102/badge/?version=latest)](https://python-102.readthedocs.io/en/latest/?badge=latest)
+An onramp to the modern data / scientific python workflow.
