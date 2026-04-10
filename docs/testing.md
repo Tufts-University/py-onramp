@@ -21,20 +21,27 @@ These seemingly unrelated questions all have the same answer, and it is
 ## Testing by example: differentiating $f(x; t) = A(t)^{-1} x$
 
 Suppose we have a vector-valued function
+
 $$
 f(x; t) = A(t)^{-1} x,
 $$
+
 where $x \in \mathbb{R}^2$ is fixed and $t$ is a scalar parameter.
 If $A(t)$ is differentiable and invertible, then differentiating the
 identity $A(t) A(t)^{-1} = I$ gives
+
 $$
 A'(t) A(t)^{-1} + A(t) \frac{d}{dt} A(t)^{-1} = 0,
 $$
+
 so
+
 $$
 \frac{d}{dt} A(t)^{-1} = -A(t)^{-1} A'(t) A(t)^{-1}.
 $$
+
 Therefore
+
 $$
 \frac{d}{dt} f(x; t)
 = \frac{d}{dt}\!\left(A(t)^{-1} x\right)
@@ -42,6 +49,7 @@ $$
 $$
 
 For a concrete example, let
+
 $$
 A(t) =
 \begin{pmatrix}
@@ -49,7 +57,9 @@ A(t) =
 0 & 1-t
 \end{pmatrix}.
 $$
+
 Then
+
 $$
 f(x; t)
 =
