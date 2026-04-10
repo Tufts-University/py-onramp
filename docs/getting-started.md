@@ -44,21 +44,14 @@ After installation, confirm that it is available:
 
 ```console
 $ uv --version
+uv 0.9.5
 ```
-
-If you do not already have a suitable Python installed, `uv` can install one:
-
-```console
-$ uv python install
-```
-
-That gives you a managed Python interpreter without needing Anaconda or a
-system-wide package manager.
 
 ## Create a new project
 
-The recommended starting point is a project directory with a `pyproject.toml`
-file. That gives `uv` a place to record metadata and dependencies.
+Usually, we begin with a fresh directory. 
+`uv` itself can be used to create this directory, and it'll package
+all the structures it needs to record metadata and dependencies.
 
 To create a simple script-oriented project:
 
@@ -93,6 +86,19 @@ $ uv add numpy matplotlib
 
 This updates your `pyproject.toml`, refreshes the lockfile, and syncs the
 project environment.
+
+```toml title="pyproject.toml"
+[project]
+name = "my-project"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.13"
+dependencies = [
+    "matplotlib>=3.10.8",
+    "numpy>=2.4.4",
+]
+```
 
 If you clone an existing project that already has a `pyproject.toml` and
 `uv.lock`, install everything recorded there with:
