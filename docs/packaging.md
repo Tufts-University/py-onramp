@@ -287,13 +287,3 @@ geometry.graphics.draw_triangle(args)
 During development, `uv` works directly with the project in your current
 checkout, so changes to your package are immediately visible the next
 time you use `uv run`.
-
-If you no longer need the environment, you can remove the project's
-`.venv` directory and recreate it later with `uv sync`.
-
-If you want to build distributable artifacts such as a wheel or source
-distribution, `uv` can do that too:
-
-```console
-$ uv build
-```
