@@ -31,10 +31,14 @@ is doing for you.
 [`uv`](https://docs.astral.sh/uv/) is a fast Python package and project manager.
 It can install Python itself, create a project, resolve dependencies, and
 manage the virtual environment in one workflow.
+Historically, there have many tools for this task but, today, I highly recommend
+`uv`.
 
 Follow the official installation instructions for your platform:
 
-- [Install `uv`](https://docs.astral.sh/uv/getting-started/installation/)
+!!! note
+
+    [Install `uv` here: https://docs.astral.sh/uv/getting-started/installation/](https://docs.astral.sh/uv/getting-started/installation/)
 
 After installation, confirm that it is available:
 
