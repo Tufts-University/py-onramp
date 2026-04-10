@@ -26,246 +26,287 @@ experience?
 These seemingly unrelated questions all have the same answer, and it is
 **automated testing**.
 
-## Testing by example: `flip_string`
+## Testing by example: differentiating $f(x; t) = A(t)^{-1} x$
 
-Here is a function called `flip_string` that flips, or reverses, a
-string. There are bug(s) in this function that we need to find and fix.
-Test the function for various inputs and compare the results obtained
-with expected output.
+Suppose we have a vector-valued function
+\[
+f(x; t) = A(t)^{-1} x,
+\]
+where \(x \in \mathbb{R}^2\) is fixed and \(t\) is a scalar parameter.
+If \(A(t)\) is differentiable and invertible, then differentiating the
+identity \(A(t) A(t)^{-1} = I\) gives
+\[
+A'(t) A(t)^{-1} + A(t) \frac{d}{dt} A(t)^{-1} = 0,
+\]
+so
+\[
+\frac{d}{dt} A(t)^{-1} = -A(t)^{-1} A'(t) A(t)^{-1}.
+\]
+Therefore
+\[
+\frac{d}{dt} f(x; t)
+= \frac{d}{dt}\!\left(A(t)^{-1} x\right)
+= -A(t)^{-1} A'(t) A(t)^{-1} x.
+\]
 
-```python title="flip_string.py"
---8<-- "code/flip_string.py"
+For a concrete example, let
+\[
+A(t) =
+\begin{pmatrix}
+1+t & 0 \\
+0 & 1-t
+\end{pmatrix}.
+\]
+Then
+\[
+f(x; t)
+=
+\begin{pmatrix}
+\dfrac{x_1}{1+t} \\
+\dfrac{x_2}{1-t}
+\end{pmatrix},
+\qquad
+\frac{d}{dt} f(x; t)
+=
+\begin{pmatrix}
+-\dfrac{x_1}{(1+t)^2} \\
+\dfrac{x_2}{(1-t)^2}
+\end{pmatrix}.
+\]
+
+Here is an original implementation based on a hand derivation. It has a
+sign error in the derivative:
+
+```python title="matrix_derivative.py"
+--8<-- "code/matrix_derivative_v1.py"
 ```
 
-- What tests did you come up with? Why did you choose those tests?
-- How did you organize and execute your tests?
-- Can the results of your tests help you figure out what problem(s)
-  there might be with the code?
+- Which tests would you write first?
+- Which values of \(x\) and \(t\) make the expected answer easy to
+  compute by hand?
+- If the derivative is wrong, can the tests tell you which sign is
+  wrong?
 
 ### Testing interactively
 
-This is the most common type of testing, and something you have probably
-done before. To test a function or a line of code, you simply fire up an
-interactive Python interpreter, import the function, and test away:
+The quickest way to test a mathematical claim is often to try a few
+simple values in an interactive Python session:
 
 ```python
->>> from flip_string import flip_string
->>> flip_string("mario")
-"oiram"
->>> flip_string("luigi")
-"igiul"
+>>> import numpy as np
+>>> from matrix_derivative_v1 import f, df_dt
+>>> x = np.array([2.0, 3.0])
+>>> f(x, 0.0)
+array([2., 3.])
+>>> df_dt(x, 0.0)
+array([ 2., -3.])
 ```
 
-While this kind of testing is better than not doing any testing at all,
-it leaves much to be desired. First, it needs to be done each time
-`flip_string` is changed. It also requires that we manually inspect the
-output from each test to decide if the code passes or fails that test.
-Further, we need to remember all the tests we came up with today if we
-want to test again tomorrow.
+The value of \(f(x; 0)\) is correct, since \(A(0) = I\). But the
+derivative is already suspicious: from the formula above we expect
+\((-2, 3)\), not \((2, -3)\).
+
+Interactive testing is useful, but it has the same limitations here as
+everywhere else. You have to remember what you tried, you have to rerun
+everything manually after each change, and you still have to inspect the
+results yourself.
 
 ### Writing a test script
 
-A *much* better way to write tests is to put them in a script:
+A much better approach is to put the checks into a script:
 
-```python title="test_flip_string.py"
---8<-- "code/test_flip_string-v1.py"
+```python title="test_matrix_derivative.py"
+--8<-- "code/test_matrix_derivative_v1.py"
 ```
 
-Now, running and re-running our tests is very easy. We just run the
-script:
+Now we can run the same checks whenever we want:
 
 ```console
-$ python test_flip_string.py
-mario flipped is: oiram
-luigi flipped is: igiul
+$ python test_matrix_derivative.py
+f(x; t) = [1.66666667 3.75      ]
+df_dt(x, t) = [ 1.38888889 -4.6875    ]
 ```
 
-It is also easy to add new tests, and there is no need to remember all
-the tests we come up with.
+This is more reproducible, but we still have to inspect the output and
+decide for ourselves whether the numbers are correct.
 
 ### Testing with assertions
 
-One problem with the method above is that we *still* need to manually
-inspect the results of our tests.
+For mathematics-heavy code, assertions are especially useful because we
+usually know what a small reference calculation should be.
 
-Assertions can help with this.
+The `assert` statement checks whether a condition is true. If it is
+false, Python raises an `AssertionError`:
 
-The `assert` statement in Python is very simple. Given a condition, like
-`1 == 2`, it checks to see if the condition is true or false. If it is
-true, then `assert` does nothing, and if it is false, it raises an
-`AssertionError`:
+We can now replace printed output with a statement of the expected
+answer:
 
-```python
->>> assert 1 == 1
->>> assert 1 < 2
->>> assert 1 > 2
+```python title="test_matrix_derivative.py"
+--8<-- "code/test_matrix_derivative_v2.py"
+```
+
+If we run this script,
+
+```console
+$ python test_matrix_derivative.py
+
 Traceback (most recent call last):
-  File "<stdin>", line 1, in <module>
+  File "test_matrix_derivative.py", line 8, in <module>
+    assert np.allclose(df_dt(x, t), np.array([-2.0, 3.0]))
 AssertionError
 ```
 
-We can re-write our script `test_flip_string.py` using assertions as
-follows:
+we immediately learn that the claimed derivative is inconsistent with a
+simple hand calculation at \(t = 0\).
 
-```python title="test_flip_string.py"
---8<-- "code/test_flip_string-v2.py"
-```
+### A brief aside: finite differences
 
-And we still run our tests the same way:
+When testing a derivative, it is often useful to have a second way to
+compute it. One common option is a finite-difference approximation:
+\[
+\frac{d}{dt} f(x; t)
+\approx
+\frac{f(x; t+h) - f(x; t-h)}{2h}.
+\]
+This is not an exact formula, but for a small value of \(h\) it provides
+an independent numerical check.
 
-```console
-$ python test_flip_string.py
-```
+Here is a script that compares the analytic derivative with both a
+hand-computed formula and a centered finite difference:
 
-This time, there is no need to inspect the test results. If we get an
-`AssertionError`, then we had a test fail, and if not, all our tests
-passed.
-
-However, there is no way to know if *more* than one test failed. The
-script stops executing after the first `AssertionError` is encountered.
-
-Let us add another test to our test script and re-run it:
-
-```python title="test_flip_string.py"
---8<-- "code/test_flip_string-v3.py"
+```python title="test_matrix_derivative.py"
+--8<-- "code/test_matrix_derivative_v3.py"
 ```
 
 ```console
-$ python test_flip_string.py
+$ python test_matrix_derivative.py
 
 Traceback (most recent call last):
-  File "test_flip_string.py", line 5, in <module>
-    assert flip_string("samus") == "sumas"
+  File "test_matrix_derivative.py", line 13, in <module>
+    assert np.allclose(df_dt(x, t), np.array([-2.0 / 1.2**2, 3.0 / 0.8**2]))
 AssertionError
 ```
 
-This time we get a failed test because, as we said, our code has bugs in
-it. Before adding more tests to investigate further, we will discuss one
-more method for running tests.
+Again, the script stops at the first failure. That is enough to tell us
+there is a problem, but not enough to summarize all the checks we care
+about.
 
 ### Using a test runner
 
-A test runner takes a bunch of tests, executes them all, and then
-reports which of them passed and which of them failed.
-
-A very popular test runner for Python is
+A test runner takes a collection of tests, executes them all, and then
+reports which passed and which failed. A very popular test runner for
+Python is
 [pytest](https://docs.pytest.org/en/latest/).
 
-To run our tests using pytest, we need to re-write them as follows,
-essentially wrapping each test in a function:
+To use `pytest`, we rewrite each check as a separate test function:
 
-```python title="test_flip_string.py"
-from flip_string import flip_string
-
-def test_flip_mario():
-    assert flip_string("mario") == "oiram"
-
-def test_flip_luigi():
-    assert flip_string("luigi") == "igiul"
-
-def test_flip_samus():
-    assert flip_string("samus") == "sumas"
+```python title="test_matrix_derivative.py"
+--8<-- "code/test_matrix_derivative_v4.py"
 ```
 
-To run our tests, we simply type `pytest` on the command line. When we
-do this, pytest will look for all files containing tests, run all the
-tests in those files, and report what it found:
+If you are already using SciPy, it also provides tools for derivative
+checks. In particular,
+[`scipy.optimize.check_grad`](https://docs.scipy.org/doc/scipy/reference/generated/scipy.optimize.check_grad.html)
+can be useful when your problem can be phrased in terms of gradients of
+scalar-valued functions. Here we will keep the test self-contained and
+write the expected formula directly.
+
+To run the tests, use the project environment:
 
 ```console
-$ pytest
+$ uv run pytest code/test_matrix_derivative_v4.py
 
 collected 3 items
 
-test_flip_string.py ..F                                               [100%]
+code/test_matrix_derivative_v4.py .FF                                 [100%]
 
 =================================== FAILURES ===================================
-_______________________________ test_flip_samus ________________________________
+______________________ test_df_dt_matches_formula_at_zero ______________________
 
-    def test_flip_samus():
->       assert flip_string("samus") == "sumas"
-E       AssertionError: assert "s" == "sumas"
-E         - s
-E         + sumas
+    def test_df_dt_matches_formula_at_zero():
+        x = np.array([2.0, 3.0])
+>       assert np.allclose(df_dt(x, 0.0), np.array([-2.0, 3.0]))
+E       assert False
+E        +  where False = <function allclose at ...>(array([ 2., -3.]), array([-2.,  3.]))
 
-test_flip_string.py:10: AssertionError
-====================== 1 failed, 2 passed in 0.07 seconds ======================
+code/test_matrix_derivative_v4.py:17: AssertionError
+
+_____________________ test_df_dt_matches_finite_difference _____________________
+
+    def test_df_dt_matches_finite_difference():
+        x = np.array([2.0, 3.0])
+        t = 0.2
+>       assert np.allclose(df_dt(x, t), finite_difference_df_dt(x, t), atol=1.0e-8)
+E       assert False
+E        +  where False = <function allclose at ...>(array([ 1.38888889, -4.6875    ]), array([-1.38888889,  4.6875    ]), atol=1e-08)
+
+code/test_matrix_derivative_v4.py:23: AssertionError
+========================= 2 failed, 1 passed in 0.07s ==========================
 ```
 
-As you can see above, pytest prints a lot of useful information in its
-report. First, it prints a summary of passed versus failed tests:
-
-```text
-test_flip_string.py ..F                                               [100%]
-```
-
-A dot (`.`) indicates a passed test, while `F` indicates a failed test.
-
-For each failed test, it provides further information, including the
-expected value as well as the obtained value in the failed assertion:
-
-```text
-=================================== FAILURES ===================================
-_______________________________ test_flip_samus ________________________________
-
-    def test_flip_samus():
->       assert flip_string("samus") == "sumas"
-E       AssertionError: assert "s" == "sumas"
-E         - s
-E         + sumas
-
-test_flip_string.py:10: AssertionError
-```
+The report is already informative. One test passed, so our function
+evaluation is fine. Two derivative tests failed, and both failures point
+to the same issue: the expected vector is the negative of what our code
+returned.
 
 ### Useful tests
 
-Now that we know how to write and run tests, what kind of tests should
-we write? Testing `flip_string` for arbitrary words like `"mario"` and
-`"luigi"` might not tell us much about where the problem might be.
+Now that we know how to run tests, which tests are actually useful for a
+derivative like this?
 
-Instead, we should choose tests that exercise specific functionality of
-the code we are testing, or represent different conditions that the code
-may be exposed to.
+Arbitrary choices of \(x\) and \(t\) are less helpful than cases that
+make the structure of the mathematics visible. For this example, useful
+tests include:
 
-Here are some examples of more useful tests:
+- \(t = 0\), where \(A(0) = I\) and the formula simplifies
+- A value such as \(t = 0.2\), where the denominators are still simple
+  but not equal to \(1\)
+- A finite-difference comparison, which checks the derivative without
+  reusing the same algebraic derivation
+- Cases where one component of \(x\) is zero, to isolate each term of
+  the derivative separately
 
-- Flipping a string with a single character, where no work needs to be
-  done
-- Flipping a string with two characters, the minimum amount of work
-  needs to be done
-- Flipping a string that reads the same forwards and backwards
-
-```python title="test_flip_string.py"
---8<-- "code/test_flip_string-v5.py"
-```
-
-```text
-collected 3 items
-
-test_flip_string-v5.py ..F                                               [100%]
-
-=================================== FAILURES ===================================
-_____________________________ test_flip_palindrome _____________________________
-
-    def test_flip_palindrome():
->       assert flip_string("aba") == "aba"
-E       AssertionError: assert "a" == "aba"
-E         - a
-E         + aba
-
-test_flip_string.py:10: AssertionError
-====================== 2 failed, 1 passed in 0.08 seconds ======================
-```
+These are the kinds of tests included in the `pytest` file above.
 
 ### Fixing the code
 
-From the test results above, we see that `flip_string` failed for the
-input `"aba"`. Now, can you trace the execution of the code in the
-function `flip_string` for this input and figure out why it returned
-`"a"`?
+The tests suggest that the code used
+\[
++A(t)^{-1} A'(t) A(t)^{-1} x
+\]
+instead of
+\[
+-A(t)^{-1} A'(t) A(t)^{-1} x.
+\]
+In other words, the hand derivation dropped the overall minus sign.
 
-After fixing the code, re-run the tests to make sure you did not break
-anything else in the process of fixing this bug. This is one of the
-reasons tests are so valuable.
+Here is the corrected implementation:
+
+```python title="matrix_derivative.py"
+--8<-- "code/matrix_derivative_v2.py"
+```
+
+If we update the tests to import the corrected implementation, we obtain
+
+```python title="test_matrix_derivative.py"
+--8<-- "code/test_matrix_derivative_v5.py"
+```
+
+and the test runner now reports
+
+```console
+$ uv run pytest code/test_matrix_derivative_v5.py
+
+collected 3 items
+
+code/test_matrix_derivative_v5.py ...                                 [100%]
+
+============================== 3 passed in 0.10s ===============================
+```
+
+This is exactly why tests are useful: they give us a way to check that
+the bug is fixed and that we did not break the rest of the calculation
+while fixing it.
 
 ## Types of testing
 
