@@ -4,16 +4,8 @@
 
     This section is based heavily on Ned Batchelder's excellent article
     and PyCon 2014 talk [Getting Started
-    Testing](https://nedbatchelder.com/text/test0.html).
-    
-    *Tests are the dental floss of development: everyone knows they
-    should do it more, but they do not, and they feel guilty about it.*
-    
-    Ned Batchelder
-    
-    *Code without tests should be approached with a 10-foot pole.*
-    
-    me
+    Testing](https://nedbatchelder.com/text/test0.html)
+    and the corresponding chapter of Python 102.
 
 How can you write modular, extensible, and reusable code?
 
@@ -29,36 +21,36 @@ These seemingly unrelated questions all have the same answer, and it is
 ## Testing by example: differentiating $f(x; t) = A(t)^{-1} x$
 
 Suppose we have a vector-valued function
-\[
+$$
 f(x; t) = A(t)^{-1} x,
-\]
-where \(x \in \mathbb{R}^2\) is fixed and \(t\) is a scalar parameter.
-If \(A(t)\) is differentiable and invertible, then differentiating the
-identity \(A(t) A(t)^{-1} = I\) gives
-\[
+$$
+where $x \in \mathbb{R}^2$ is fixed and $t$ is a scalar parameter.
+If $A(t)$ is differentiable and invertible, then differentiating the
+identity $A(t) A(t)^{-1} = I$ gives
+$$
 A'(t) A(t)^{-1} + A(t) \frac{d}{dt} A(t)^{-1} = 0,
-\]
+$$
 so
-\[
+$$
 \frac{d}{dt} A(t)^{-1} = -A(t)^{-1} A'(t) A(t)^{-1}.
-\]
+$$
 Therefore
-\[
+$$
 \frac{d}{dt} f(x; t)
 = \frac{d}{dt}\!\left(A(t)^{-1} x\right)
 = -A(t)^{-1} A'(t) A(t)^{-1} x.
-\]
+$$
 
 For a concrete example, let
-\[
+$$
 A(t) =
 \begin{pmatrix}
 1+t & 0 \\
 0 & 1-t
 \end{pmatrix}.
-\]
+$$
 Then
-\[
+$$
 f(x; t)
 =
 \begin{pmatrix}
@@ -72,7 +64,7 @@ f(x; t)
 -\dfrac{x_1}{(1+t)^2} \\
 \dfrac{x_2}{(1-t)^2}
 \end{pmatrix}.
-\]
+$$
 
 Here is an original implementation based on a hand derivation. It has a
 sign error in the derivative:
@@ -82,7 +74,7 @@ sign error in the derivative:
 ```
 
 - Which tests would you write first?
-- Which values of \(x\) and \(t\) make the expected answer easy to
+- Which values of $x$ and $t$ make the expected answer easy to
   compute by hand?
 - If the derivative is wrong, can the tests tell you which sign is
   wrong?
@@ -102,9 +94,9 @@ array([2., 3.])
 array([ 2., -3.])
 ```
 
-The value of \(f(x; 0)\) is correct, since \(A(0) = I\). But the
+The value of $f(x; 0)$ is correct, since $A(0) = I$. But the
 derivative is already suspicious: from the formula above we expect
-\((-2, 3)\), not \((2, -3)\).
+$(-2, 3)$, not $(2, -3)$.
 
 Interactive testing is useful, but it has the same limitations here as
 everywhere else. You have to remember what you tried, you have to rerun
@@ -157,18 +149,18 @@ AssertionError
 ```
 
 we immediately learn that the claimed derivative is inconsistent with a
-simple hand calculation at \(t = 0\).
+simple hand calculation at $t = 0$.
 
 ### A brief aside: finite differences
 
 When testing a derivative, it is often useful to have a second way to
 compute it. One common option is a finite-difference approximation:
-\[
+$$
 \frac{d}{dt} f(x; t)
 \approx
 \frac{f(x; t+h) - f(x; t-h)}{2h}.
-\]
-This is not an exact formula, but for a small value of \(h\) it provides
+$$
+This is not an exact formula, but for a small value of $h$ it provides
 an independent numerical check.
 
 Here is a script that compares the analytic derivative with both a
@@ -254,16 +246,16 @@ returned.
 Now that we know how to run tests, which tests are actually useful for a
 derivative like this?
 
-Arbitrary choices of \(x\) and \(t\) are less helpful than cases that
+Arbitrary choices of $x$ and $t$ are less helpful than cases that
 make the structure of the mathematics visible. For this example, useful
 tests include:
 
-- \(t = 0\), where \(A(0) = I\) and the formula simplifies
-- A value such as \(t = 0.2\), where the denominators are still simple
-  but not equal to \(1\)
+- $t = 0$, where $A(0) = I$ and the formula simplifies
+- A value such as $t = 0.2$, where the denominators are still simple
+  but not equal to $1$
 - A finite-difference comparison, which checks the derivative without
   reusing the same algebraic derivation
-- Cases where one component of \(x\) is zero, to isolate each term of
+- Cases where one component of $x$ is zero, to isolate each term of
   the derivative separately
 
 These are the kinds of tests included in the `pytest` file above.
@@ -271,13 +263,13 @@ These are the kinds of tests included in the `pytest` file above.
 ### Fixing the code
 
 The tests suggest that the code used
-\[
+$$
 +A(t)^{-1} A'(t) A(t)^{-1} x
-\]
+$$
 instead of
-\[
+$$
 -A(t)^{-1} A'(t) A(t)^{-1} x.
-\]
+$$
 In other words, the hand derivation dropped the overall minus sign.
 
 Here is the corrected implementation:
