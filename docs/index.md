@@ -59,7 +59,3 @@ student/ researcher audience.
 
 - [Getting Started](getting-started.md)
 - [Packaging](packaging.md)
-- [Testing](testing.md)
-- [Documenting](documenting.md)
-- [Usability](usability.md)
-- [Performance](performance.md)
