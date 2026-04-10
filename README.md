@@ -12,10 +12,10 @@ This is forked from the excellent [Python 102](https://python-102.readthedocs.io
 - [x] `docs/index.md`
   - [x] Replace the Anaconda-first setup guidance with a `uv`-first workflow.
   - [x] Add a short "getting started" path for local development: install Python, create/sync the environment, and run examples with `uv run`.
-- [ ] `docs/packaging.md`
-  - [ ] Rewrite the installable-project section around `pyproject.toml` instead of `setup.py`.
-  - [ ] Prefer modern packaging guidance based on `uv` and PEP 517/518/621 rather than `setuptools` plus manual `pip install -e . --user`.
-  - [ ] Add examples for editable installs, dependency groups, and lockfile-driven reproducibility.
+- [x] `docs/packaging.md`
+  - [x] Rewrite the installable-project section around `pyproject.toml` instead of `setup.py`.
+  - [x] Prefer modern packaging guidance based on `uv` and PEP 517/518/621 rather than `setuptools` plus manual `pip install -e . --user`.
+  - [x] Add examples for editable installs, dependency groups, and lockfile-driven reproducibility.
 - [ ] `docs/usability.md`
   - [ ] Replace `setup.py` `entry_points` examples with `[project.scripts]` in `pyproject.toml`.
   - [ ] Update install/run examples so they reflect `uv run`, project-local environments, and modern CLI/TOML workflows.

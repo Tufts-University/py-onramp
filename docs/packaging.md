@@ -219,49 +219,81 @@ packages in when you `import` them.
 
 ### Installable projects
 
-A better way is to make your project installable using
-[setuptools](https://setuptools.readthedocs.io/en/latest/). To do this,
-you will need to include a `setup.py` with your project. Your project
-should be organized as follows:
+A better way is to turn your code into a proper project with
+[`uv`](https://docs.astral.sh/uv/). For a reusable library, `uv` can
+create the basic layout for you:
+
+```console
+$ uv init --lib geometry
+$ cd geometry
+```
+
+This creates a `pyproject.toml` describing the project, a package
+directory for your importable code, and a local project environment that
+`uv` can manage for you. A small library project might then look like
+this:
 
 ```text
-draw_triangles.py
+pyproject.toml
+README.md
 geometry
 ├── graphics.py
 └── __init__.py
-setup.py
 ```
 
-A minimal `setup.py` can include the following:
+A minimal `pyproject.toml` can include the following:
 
-```python title="setup.py"
-from setuptools import setup
-
-setup(
-    name="geometry",
-    version="0.1",
-    author="Jane Doe",
-    packages=["geometry"],
-)
+```toml title="pyproject.toml"
+[project]
+name = "geometry"
+version = "0.1.0"
+description = "Geometry utilities for drawing and transforming shapes"
+readme = "README.md"
+requires-python = ">=3.12"
 ```
 
-You can install the package using `pip` with the following command, run
-from the same directory as `setup.py`:
+If the project has dependencies, add them with `uv add`:
 
 ```console
-$ pip install -e . --user
+$ uv add matplotlib
 ```
 
-This installs the package in *editable* mode, creating a link to it in
-the user's `site-packages` directory, which happens to already be in
-`sys.path`.
+This updates `pyproject.toml`, refreshes the lockfile, and syncs the
+project environment.
 
-Once your project is installed, you do not need to worry about adding it
-manually to `sys.path` each time you need to use it.
-
-It is also easy to *uninstall* a package. Run the following command from
-the same directory as `setup.py`:
+To create or refresh the environment for the project, run:
 
 ```console
-$ pip uninstall .
+$ uv sync
+```
+
+Once the project environment exists, you can run Python or other tools
+inside it with `uv run`:
+
+```console
+$ uv run python
+```
+
+This starts Python with your package available for import, without
+manually editing `sys.path`.
+
+For example:
+
+```python
+import geometry.graphics
+geometry.graphics.draw_triangle(args)
+```
+
+During development, `uv` works directly with the project in your current
+checkout, so changes to your package are immediately visible the next
+time you use `uv run`.
+
+If you no longer need the environment, you can remove the project's
+`.venv` directory and recreate it later with `uv sync`.
+
+If you want to build distributable artifacts such as a wheel or source
+distribution, `uv` can do that too:
+
+```console
+$ uv build
 ```
