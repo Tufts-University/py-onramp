@@ -45,6 +45,12 @@ If you plan to participate in the hands-on exercises, you will need:
   if you have not already, please introduce yourself to your
   neighbour(s).
 
+## Acknowledgements
+
+This is forked from the excellent
+[Python 102](https://python-102.readthedocs.io/) writeup, just lightly
+modernized for tooling and with HPC sections.
+
 ## Contents
 
 - [Packaging](packaging.md)
