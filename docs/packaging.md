@@ -1,5 +1,10 @@
 # Organizing code for a Python project
 
+!!! note 
+
+    This first half of this writeup is borrowed from the excellent [Python
+    102](https://python-102.readthedocs.io/) repository.
+
 A well structured project is easy to navigate and make changes and
 improvements to. It is also more likely to be used by other people, and
 that includes *you* a few weeks from now.
