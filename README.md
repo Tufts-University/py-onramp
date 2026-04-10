@@ -5,6 +5,35 @@ An onramp to the modern data / scientific python workflow.
 ## Acknowledgements
 This is forked from the excellent [Python 102](https://python-102.readthedocs.io/) writeup, just modernized for tooling and with HPC sections.
 
+## Building The Docs Site Locally
+
+Install project dependencies with `uv`, including all dependency groups:
+
+```bash
+uv sync --all-groups
+```
+
+Then build the docs site locally with MkDocs:
+
+```bash
+uv run mkdocs build --strict
+```
+
+This writes the generated site to `site/`. Use this when you want to error
+check if everything builds cleanly. Alternatively, you can serve the docs
+locally during development:
+
+```bash
+uv run mkdocs serve
+```
+
+Serving starts a local development server and rebuilds automatically as you
+edit the docs, which is more convenient while writing.
+
+The [`Docs` GitHub Actions workflow](./.github/workflows/docs.yml) builds and
+deploys the site automatically for pushes to `master`, so generated site
+artifacts should not be committed or pushed.
+
 ## Docs Modernization TODO
 
 ### Must Have
