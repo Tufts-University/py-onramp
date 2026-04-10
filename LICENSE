@@ -20,7 +20,16 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 
-Original fork license (verbatim)
+---
+
+This software is a derivative work of:
+
+python-102
+https://github.com/shwina/python-102
+Copyright (c) 2018 Ashwin Srinath.
+Licensed under the MIT License.
+
+Original upstream license (verbatim)
 
 MIT License
 
