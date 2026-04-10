@@ -1,0 +1,20 @@
+[project]
+name = "py-onramp"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.13"
+dependencies = []
+
+[dependency-groups]
+docs = [
+    "mkdocs>=1.6.1",
+    "mkdocs-material>=9.6.0",
+    "pymdown-extensions>=10.15",
+]
+examples = [
+    "matplotlib>=3.10.8",
+    "numba>=0.65.0",
+    "numpy>=2.4.4",
+    "pandas>=3.0.2",
+]
