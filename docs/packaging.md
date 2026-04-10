@@ -240,7 +240,7 @@ from setuptools import setup
 setup(
     name="geometry",
     version="0.1",
-    author="Ashwin Srinath",
+    author="Jane Doe",
     packages=["geometry"],
 )
 ```
