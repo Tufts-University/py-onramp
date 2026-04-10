@@ -66,8 +66,10 @@ f(x; t)
 \end{pmatrix}.
 $$
 
-Here is an original implementation based on a hand derivation. It has a
-sign error in the derivative:
+Here is an original implementation based on a hand derivation. 
+There are bug(s) in this function that we need to find and fix. 
+On your own, test the function for various inputs and compare the results
+obtained with expected output.
 
 ```python title="matrix_derivative.py"
 --8<-- "code/matrix_derivative_v1.py"
