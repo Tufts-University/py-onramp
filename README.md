@@ -2,9 +2,6 @@
 
 An onramp to the modern data / scientific python workflow.
 
-## Acknowledgements
-This is forked from the excellent [Python 102](https://python-102.readthedocs.io/) writeup, just modernized for tooling and with HPC sections.
-
 ## Building The Docs Site Locally
 
 Install project dependencies with `uv`, including all dependency groups:
@@ -79,6 +76,7 @@ artifacts should not be committed or pushed.
 
 - [ ] New docs section: plotting and communication
   - [ ] Cover publication-quality figures, labeling, styles, vector exports, and reproducible figure generation with Matplotlib.
+  - [ ] TikZ? Liz?
 - [ ] New docs section: core scientific Python tools for math research
   - [ ] Add guidance on when to use NumPy, SciPy, sparse matrices, optimization/integration/linear algebra routines, and where JAX fits relative to NumPy/SciPy.
 - [ ] New docs section: research project layout

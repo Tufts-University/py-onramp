@@ -49,12 +49,6 @@ The examples, code design, and tools are primarily designed with that field in
 mind.
 While many of the ideas are transferable, we cannot guarantee that.
 
-## Acknowledgements
-
-This is forked from the excellent [Python 102](https://python-102.readthedocs.io/) 
-writeup but expanded in scope, modernized in tooling, and redesigned for a
-student/ researcher audience.
-
 ## Contents
 
 - [Getting Started](getting-started.md)
