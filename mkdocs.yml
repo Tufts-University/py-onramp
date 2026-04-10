@@ -26,6 +26,15 @@ theme:
     - content.code.copy
   palette:
     - scheme: default
+      toggle:
+        icon: material/weather-night
+        name: Switch to dark mode
+      primary: teal
+      accent: blue
+    - scheme: slate
+      toggle:
+        icon: material/weather-sunny
+        name: Switch to light mode
       primary: teal
       accent: blue
 
