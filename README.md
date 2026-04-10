@@ -81,5 +81,32 @@ artifacts should not be committed or pushed.
   - [ ] Add guidance on when to use NumPy, SciPy, sparse matrices, optimization/integration/linear algebra routines, and where JAX fits relative to NumPy/SciPy.
 - [ ] New docs section: research project layout
   - [ ] Show a recommended directory structure for `src`, tests, docs, scripts, data, results, and generated artifacts.
+  - [ ] Discuss how to store metrics, including timings
+  - [ ] Reproducibility
 - [ ] New docs section: remote and cluster-native development
   - [ ] Cover remote editing, data transfer, checkpoint/restart patterns, and environment portability across laptop and cluster.
+- [ ] New docs section: Github workflow
+  - [ ] Unit tests and Github Actions
+  - [ ] Collaborating
+- [ ] New docs section: OOP
+ 
+### Potential Small Projects
+- [ ] Using SLURM
+  - [ ] Hello, World!
+  - [ ] Parallelization: within script and using SLURM calls
+  - [ ] Optuna: train basic DNN
+  - [ ] Python vs. MATLAB
+- [ ] Compare optimizers/samplers on testbed 2D problems
+  - [ ] GD vs Newton
+  - [ ] JAX vs. loop
+  - [ ] Deterministics vs. Stochastic
+- [ ] Testing numerics
+  - [ ] Derivatives: finite difference/Taylor approximation, first and second order
+  - [ ] Linear solvers: CG vs. BFGS
+- [ ] Replicate results from a paper
+  - [ ] Write up documentation
+- [ ] Image Applications
+  - [ ] Compression (SVD)
+  - [ ] Deblurring (Inverse Problem)
+- [ ] Solve ODE/PDE
+- [ ] ...
