@@ -89,6 +89,7 @@ artifacts should not be committed or pushed.
   - [ ] Unit tests and Github Actions
   - [ ] Collaborating
 - [ ] New docs section: OOP
+- [ ] New docs section: using Claude
  
 ### Potential Small Projects
 - [ ] Using SLURM
