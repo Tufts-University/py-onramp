@@ -1,9 +1,30 @@
 # Getting started with modern scientific Python
 
+We've embarked. It's time to run some code!
+
+```python title="hello_matplotlib.py"
+--8<-- "code/hello_matplotlib.py"
+```
+
+We run it with python and...
+```console
+> python hello_matplotlib.py
+Traceback (most recent call last):
+  File "/home/lotus/Repositories/py-onramp/code/hello_matplotlib.py", line 2, in <module>
+    import matplotlib.pyplot as plt
+ModuleNotFoundError: No module named 'matplotlib'
+```
+
+Well. Anticlimactic.
+
+One of the greatest stengths of the Python of today is vast ecosystem of
+existing code that you can rely on. To get started with python, we first must
+learn how to manage those dependencies, in this case `matplotlib` and `numpy`!
+
 This page is the practical starting point for a new scientific Python project.
 The goal is to get a working local environment using `uv`, install the
-dependencies you need, and understand what the project-local virtual
-environment is doing for you.
+dependencies you need, and understand what the project-local virtual environment
+is doing for you.
 
 ## Install `uv`
 
@@ -63,7 +84,7 @@ like module structure, installable projects, and publishing belong.
 Once the project exists, add the packages you need with `uv add`:
 
 ```console
-$ uv add numpy pytest
+$ uv add numpy matplotlib
 ```
 
 This updates your `pyproject.toml`, refreshes the lockfile, and syncs the
@@ -86,7 +107,8 @@ Use `uv run` to execute code inside the project's environment:
 $ uv run main.py
 ```
 
-You can also run tools this way:
+You can also run tools this way. For example, if you installed `pytest` (which
+we will discuss later), you could run the corresponding CLI tool as
 
 ```console
 $ uv run pytest
@@ -133,3 +155,14 @@ $ uv run main.py
 
 For more on structuring that project as an installable package or library, move
 on to [Packaging](packaging.md).
+
+As for our original example: Running
+
+```console
+$ uv init my-project
+$ cd my-project
+$ uv add numpy matplotlib
+$ uv run hello_matplotlib.py # Having obtained this file somehow
+```
+
+![Hello Matplotlib!](images/hello_matplotlib.png){ width="60%" }
