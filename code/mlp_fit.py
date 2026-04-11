@@ -8,7 +8,6 @@ Those are layered on in subsequent examples that import from this file.
 
 import dataclasses
 import json
-from typing import cast
 
 import equinox as eqx
 import jax
@@ -21,7 +20,6 @@ from jaxtyping import Array, Float, PRNGKeyArray
 # ---------------------------------------------------------------------------
 
 Key = PRNGKeyArray
-MLP = eqx.nn.MLP
 Inputs = Float[Array, "n 2"]
 Targets = Float[Array, "n"]
 Loss = Float[Array, ""]
@@ -40,18 +38,21 @@ TestTargets = Float[Array, "n_test"]
 
 
 @dataclasses.dataclass
-class OptStats:
-    train_losses: list[float]
-    val_losses: list[float]
+class FinalStats:
     final_train_loss: float
     final_val_loss: float
-    final_test_loss: float | None
+    final_test_loss: float
+
+
+@dataclasses.dataclass
+class TrainStats:
+    train_losses: list[float]
+    val_losses: list[float]
     n_epochs: int
     lr: float
     batch_size: int
     n_train: int
     n_val: int
-    n_test: int
 
 
 # ---------------------------------------------------------------------------
@@ -67,7 +68,8 @@ def generate_data(
 
     Returns (X, y) where X has shape (n_points, 2) and y has shape (n_points,).
     """
-    x = jax.random.uniform(key, shape=(n_points, 2))
+    x_key, noise_key = jax.random.split(key)
+    x = jax.random.uniform(x_key, shape=(n_points, 2))
     x1, x2 = x[:, 0], x[:, 1]
     y = (
         x1
@@ -76,7 +78,6 @@ def generate_data(
         * jnp.sin(4.0 * jnp.pi * x2**2) ** 2
     )
     if noise_std > 0.0:
-        noise_key, _ = jax.random.split(key)
         y = y + jax.random.normal(noise_key, shape=y.shape) * noise_std
     return x, y
 
@@ -85,6 +86,8 @@ def make_splits(
     x: Inputs, y: Targets, test_size: float, val_size: float, key: Key
 ) -> tuple[TrainInputs, TrainTargets, ValInputs, ValTargets, TestInputs, TestTargets]:
     """Split arrays into deterministic train/validation/test sets."""
+    if not (0.0 <= val_size <= 1.0) or (0.0 <= test_size <= 1.0):
+        raise ValueError(f"sizes must lie in [0.0, 1.0], got {(test_size,val_size)=}")
     if (val_size + test_size) > 1.0:
         raise ValueError(
             f"Must have val_size + test_size <= 1.0, got {val_size+test_size=}"
@@ -104,8 +107,8 @@ def make_splits(
 
 
 @eqx.filter_jit
-def evaluate(mlp: MLP, x: Inputs, y: Targets) -> Loss:
-    """Compute full-dataset mean squared error."""
+def mse_loss(mlp: eqx.Module, x: Inputs, y: Targets) -> Loss:
+    """Compute mean squared error on a batch or full dataset."""
     pred = jax.vmap(mlp)(x)
     return jnp.mean((pred - y) ** 2)
 
@@ -116,16 +119,16 @@ def evaluate(mlp: MLP, x: Inputs, y: Targets) -> Loss:
 
 
 def train(
-    mlp: MLP,
-    x_train: Inputs,
-    y_train: Targets,
-    x_val: Inputs,
-    y_val: Targets,
+    mlp: eqx.Module,
+    x_train: TrainInputs,
+    y_train: TrainTargets,
+    x_val: ValInputs,
+    y_val: ValTargets,
     lr: float,
     n_epochs: int,
     batch_size: int,
     key: Key,
-) -> tuple[MLP, OptStats]:
+) -> tuple[eqx.Module, TrainStats]:
     """
     Train mlp with Adam to minimise MSE on (x_train, y_train), evaluating on
     (x_val, y_val) each epoch.
@@ -133,19 +136,24 @@ def train(
     Each epoch shuffles the training set with a JAX permutation and then walks
     through contiguous mini-batches, keeping the final short batch if needed.
 
-    Returns the trained model and an OptStats with per-epoch loss history.
+    Returns the trained model and a TrainStats with per-epoch loss history.
     """
+    if n_epochs < 1:
+        raise ValueError(f"n_epochs must be at least 1, got {n_epochs=}")
+    if batch_size < 1:
+        raise ValueError(f"batch_size must be at least 1, got {batch_size=}")
+
     optimizer = optax.adam(lr)
     opt_state = optimizer.init(eqx.filter(mlp, eqx.is_array))
 
     @eqx.filter_jit
     def step(
-        mlp: MLP,
+        mlp: eqx.Module,
         opt_state: optax.OptState,
         xb: BatchInputs,
         yb: BatchTargets,
-    ) -> tuple[MLP, optax.OptState, Loss]:
-        loss, grads = eqx.filter_value_and_grad(evaluate)(mlp, xb, yb)
+    ) -> tuple[eqx.Module, optax.OptState, Loss]:
+        loss, grads = eqx.filter_value_and_grad(mse_loss)(mlp, xb, yb)
         updates, new_opt_state = optimizer.update(
             grads, opt_state, eqx.filter(mlp, eqx.is_array)
         )
@@ -153,40 +161,32 @@ def train(
 
     n_train = len(x_train)
     epoch_keys = jax.random.split(key, n_epochs)
-
     train_losses: list[float] = []
     val_losses: list[float] = []
-
     for epoch_key in epoch_keys:
         permutation = jax.random.permutation(epoch_key, n_train)
         x_epoch = x_train[permutation]
         y_epoch = y_train[permutation]
 
         epoch_loss = 0.0
-        n_batches = 0
         for start in range(0, n_train, batch_size):
             stop = min(start + batch_size, n_train)
             xb = x_epoch[start:stop]
             yb = y_epoch[start:stop]
             mlp, opt_state, loss = step(mlp, opt_state, xb, yb)
-            epoch_loss += float(loss)
-            n_batches += 1
+            epoch_loss += float(loss) * len(xb)
 
-        train_losses.append(epoch_loss / max(n_batches, 1))
-        val_losses.append(float(evaluate(mlp, x_val, y_val)))
+        train_losses.append(epoch_loss / n_train)
+        val_losses.append(float(mse_loss(mlp, x_val, y_val)))
 
-    stats = OptStats(
+    stats = TrainStats(
         train_losses=train_losses,
         val_losses=val_losses,
-        final_train_loss=train_losses[-1],
-        final_val_loss=val_losses[-1],
-        final_test_loss=None,
         n_epochs=n_epochs,
         lr=lr,
         batch_size=batch_size,
         n_train=len(x_train),
         n_val=len(x_val),
-        n_test=0,
     )
     return mlp, stats
 
@@ -200,7 +200,8 @@ if __name__ == "__main__":
     N_TOTAL = 5000
     VAL_SIZE = 0.2
     TEST_SIZE = 0.2
-    HIDDEN = [64, 64]
+    WIDTH = 64
+    DEPTH = 2
     LR = 3e-3
     N_EPOCHS = 200
     BATCH_SIZE = 256
@@ -219,32 +220,33 @@ if __name__ == "__main__":
         key=split_key,
     )
 
-    mlp = cast(
-        MLP,
-        eqx.nn.MLP(
-            in_size=2,
-            out_size="scalar",
-            width_size=HIDDEN[0],
-            depth=len(HIDDEN),
-            activation=jax.nn.tanh,
-            key=key,
-        ),
+    mlp = eqx.nn.MLP(
+        in_size=2,
+        out_size="scalar",
+        width_size=WIDTH,
+        depth=DEPTH,
+        activation=jax.nn.tanh,
+        key=model_key,
     )
-    mlp, stats = train(
+    mlp, train_stats = train(
         mlp, x_train, y_train, x_val, y_val, LR, N_EPOCHS, BATCH_SIZE, train_key
     )
-    test_loss = float(evaluate(mlp, x_test, y_test))
-    stats.n_test = len(x_test)
-    stats.final_test_loss = test_loss
+    final_stats = FinalStats(
+        final_train_loss=float(mse_loss(mlp, x_train, y_train)),
+        final_val_loss=float(mse_loss(mlp, x_val, y_val)),
+        final_test_loss=float(mse_loss(mlp, x_test, y_test)),
+    )
+    print(f"  final train loss : {final_stats.final_train_loss:.6f}")
+    print(f"  final val   loss : {final_stats.final_val_loss:.6f}")
+    print(f"  final test  loss : {final_stats.final_test_loss:.6f}")
 
     # Save model weights (equinox native format)
     eqx.tree_serialise_leaves("mlp.eqx", mlp)
     print("Model saved to mlp.eqx")
 
     # Save stats as JSON
-    with open("opt_stats.json", "w") as f:
-        json.dump(dataclasses.asdict(stats), f, indent=2)
-    print("Stats saved to opt_stats.json")
-    print(f"  final train loss : {stats.final_train_loss:.6f}")
-    print(f"  final val   loss : {stats.final_val_loss:.6f}")
-    print(f"  final test  loss : {stats.final_test_loss:.6f}")
+    with open("final_stats.json", "w", encoding="utf-8") as f:
+        json.dump(dataclasses.asdict(final_stats), f, indent=2)
+    with open("train_stats.json", "w", encoding="utf-8") as f:
+        json.dump(dataclasses.asdict(final_stats), f, indent=2)
+    print("Stats saved to final_stats.json and train_stats.json")
