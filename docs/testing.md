@@ -381,6 +381,5 @@ growing tests:
 4. **Test data should include difficult and edge cases**: it is easy to
    write code that only handles cases with well-defined inputs and
    outputs. In practice however, your code may have to deal with input
-   data for which it is not clear what the behavior should be. For
-   example, what should `flip_string("")` return? Make sure you write
-   tests for such cases, so that you force your code to handle them.
+   data for which it is not clear what the behavior should be. Make sure you
+   write tests for such cases, so that you force your code to handle them.
