@@ -272,13 +272,17 @@ These are the kinds of tests included in the `pytest` file above.
 ### Fixing the code
 
 The tests suggest that the code used
+
 $$
 +A(t)^{-1} A'(t) A(t)^{-1} x
 $$
+
 instead of
+
 $$
 -A(t)^{-1} A'(t) A(t)^{-1} x.
 $$
+
 In other words, the hand derivation dropped the overall minus sign.
 
 Here is the corrected implementation:
