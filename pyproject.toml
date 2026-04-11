@@ -7,15 +7,27 @@ requires-python = ">=3.13"
 dependencies = []
 
 [dependency-groups]
+dev = [
+    "ipython>=9.12.0",
+    "ruff>=0.15.10",
+    "ty>=0.0.29",
+]
 docs = [
     "mkdocs>=1.6.1",
+    "mkdocs-marimo>=0.2.1",
     "mkdocs-material>=9.6.0",
     "pymdown-extensions>=10.15",
 ]
 examples = [
+    "equinox>=0.13.6",
+    "jax>=0.9.2",
+    "jaxtyping>=0.3.9",
+    "marimo>=0.23.1",
     "matplotlib>=3.10.8",
     "numba>=0.65.0",
     "numpy>=2.4.4",
+    "optax>=0.2.8",
     "pandas>=3.0.2",
     "pytest>=9.0.3",
+    "scikit-learn>=1.8.0",
 ]
