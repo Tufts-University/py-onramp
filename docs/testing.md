@@ -7,43 +7,37 @@
     Testing](https://nedbatchelder.com/text/test0.html)
     and the corresponding chapter of Python 102.
 
-How can you write modular, extensible, and reusable code?
+How can you write reusable and trustworthy code?
 
 After making changes to a program, how do you ensure that it will still
 give the same answers as before?
 
-How can we make finding and fixing bugs an easy, fun, and rewarding
-experience?
+How can we make finding and fixing bugs a ~~simple, fun, and rewarding~~
+minimally frustrating experience?
 
 These seemingly unrelated questions all have the same answer, and it is
 **automated testing**.
 
-## Testing by example: differentiating $f(x; t) = A(t)^{-1} x$
+## Testing by example: differentiating a matrix solve
 
-Suppose we have a vector-valued function
-
-$$
-f(x; t) = A(t)^{-1} x,
-$$
-
-where $x \in \mathbb{R}^2$ is fixed and $t$ is a scalar parameter.
-If $A(t)$ is differentiable and invertible, then differentiating the
-identity $A(t) A(t)^{-1} = I$ gives
+For scalar $t$, consider the parametrized matrix equation
 
 $$
-A'(t) A(t)^{-1} + A(t) \frac{d}{dt} A(t)^{-1} = 0,
+A(t)f = b
 $$
 
-so
+and consider it's solution as a function of $t$, e.g. $f(t) = A(t)^{-1}b$.
+If $A(t)$ is differentiable and invertible for all $t$, then there's a cool
+matrix identity which tells us that
 
 $$
 \frac{d}{dt} A(t)^{-1} = -A(t)^{-1} A'(t) A(t)^{-1}.
 $$
 
-Therefore
+Hence
 
 $$
-\frac{d}{dt} f(x; t)
+\frac{d}{dt} f(t)
 = \frac{d}{dt}\!\left(A(t)^{-1} x\right)
 = -A(t)^{-1} A'(t) A(t)^{-1} x.
 $$
@@ -77,6 +71,7 @@ f(x; t)
 $$
 
 Here is an original implementation based on a hand derivation. 
+*However, I've made a critical error somewhere in here*!
 There are bug(s) in this function that we need to find and fix. 
 On your own, test the function for various inputs and compare the results
 obtained with expected output.
@@ -167,11 +162,13 @@ simple hand calculation at $t = 0$.
 
 When testing a derivative, it is often useful to have a second way to
 compute it. One common option is a finite-difference approximation:
+
 $$
 \frac{d}{dt} f(x; t)
 \approx
 \frac{f(x; t+h) - f(x; t-h)}{2h}.
 $$
+
 This is not an exact formula, but for a small value of $h$ it provides
 an independent numerical check.
 
@@ -275,13 +272,17 @@ These are the kinds of tests included in the `pytest` file above.
 ### Fixing the code
 
 The tests suggest that the code used
+
 $$
 +A(t)^{-1} A'(t) A(t)^{-1} x
 $$
+
 instead of
+
 $$
 -A(t)^{-1} A'(t) A(t)^{-1} x.
 $$
+
 In other words, the hand derivation dropped the overall minus sign.
 
 Here is the corrected implementation:
@@ -380,6 +381,5 @@ growing tests:
 4. **Test data should include difficult and edge cases**: it is easy to
    write code that only handles cases with well-defined inputs and
    outputs. In practice however, your code may have to deal with input
-   data for which it is not clear what the behavior should be. For
-   example, what should `flip_string("")` return? Make sure you write
-   tests for such cases, so that you force your code to handle them.
+   data for which it is not clear what the behavior should be. Make sure you
+   write tests for such cases, so that you force your code to handle them.
