@@ -71,6 +71,7 @@ f(x; t)
 $$
 
 Here is an original implementation based on a hand derivation. 
+*However, I've made a critical error somewhere in here*!
 There are bug(s) in this function that we need to find and fix. 
 On your own, test the function for various inputs and compare the results
 obtained with expected output.

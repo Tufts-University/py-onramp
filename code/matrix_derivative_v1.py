@@ -8,7 +8,7 @@ def A(t: float) -> NDArray[float]:
 
 
 def dA_dt(t: float) -> NDArray[float]:
-    """Return an incorrect derivative of A(t) with a sign error."""
+    """Return an derivative of A(t)."""
     return np.array([[-1.0, 0.0], [0.0, 1.0]])
 
 
