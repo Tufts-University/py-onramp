@@ -12,6 +12,7 @@ nav:
   - Getting Started: getting-started.md
   - Packaging: packaging.md
   - Testing: testing.md
+  - Parametrization: parametrization.md
 
 theme:
   name: material
