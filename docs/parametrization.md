@@ -3,6 +3,7 @@
 !!! note
 
     TODO: Redo this with a repo that they can clone and work in..
+    This seciton generally needs work.
 
 When you are experimenting, you change things constantly.
 
