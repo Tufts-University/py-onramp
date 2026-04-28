@@ -15,7 +15,7 @@ Traceback (most recent call last):
 ModuleNotFoundError: No module named 'matplotlib'
 ```
 
-Well. Anticlimactic.
+Well, that's unfortunate.
 
 One of the greatest stengths of the Python of today is vast ecosystem of
 existing code that you can rely on. To get started with python, we first must
