@@ -45,6 +45,7 @@ artifacts should not be committed or pushed.
 - [ ] `docs/usability.md`
   - [ ] Replace `setup.py` `entry_points` examples with `[project.scripts]` in `pyproject.toml`.
   - [ ] Update install/run examples so they reflect `uv run`, project-local environments, and modern CLI/TOML workflows.
+  - [ ] Debugging with uv and VSCode
 - [ ] `docs/performance.md`
   - [ ] Replace or supplement the `Numba` section with a more current accelerator/JIT section built around JAX.
   - [ ] Refresh the parallelization discussion to mention current options such as JAX, Dask, multiprocessing/joblib, and when each is appropriate.
