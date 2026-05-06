@@ -51,6 +51,7 @@ While many of the ideas are transferable, we cannot guarantee that.
 
 ## Contents
 
+- [The Command Line](command-line.md)
 - [Getting Started](getting-started.md)
 - [Packaging](packaging.md)
 - [Testing](testing.md)

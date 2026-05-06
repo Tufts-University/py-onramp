@@ -1,5 +1,8 @@
 # Getting started with modern scientific Python
 
+> [!CAUTION]
+> Rewrite this so that there's a sandbox in this repo for them to play with.
+
 We've embarked. It's time to run some code!
 
 ```python
