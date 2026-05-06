@@ -4,6 +4,7 @@ some triangles.
 """
 
 import matplotlib.pyplot as plt
+plt.style.use('dark_background')
 
 def plot_triangle(points, ax=None):
     if ax is None:
@@ -40,4 +41,4 @@ if __name__ == "__main__":
         (0.9, 0.2)
     ])
 
-    plt.savefig('../docs/images/triangle.png', transparent=True)
+    plt.savefig('../docs/images/triangle.png')
