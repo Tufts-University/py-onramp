@@ -1,9 +1,8 @@
 # Organizing code for a Python project
 
-!!! note 
-
-    This first half of this writeup is borrowed from the excellent [Python
-    102](https://python-102.readthedocs.io/) repository.
+> [!NOTE]
+> This first half of this writeup is borrowed from the excellent [Python
+> 102](https://python-102.readthedocs.io/) repository.
 
 A well structured project is easy to navigate and make changes and
 improvements to. It is also more likely to be used by other people, and
@@ -13,15 +12,15 @@ that includes *you* a few weeks from now.
 
 We want to write a Python program that draws triangles:
 
-![Triangle example](images/triangle.png){ width="60%" }
+<img src="images/triangle.png" alt="Triangle example" width="60%">
 
 We use the
 [Polygon](https://matplotlib.org/gallery/api/patch_collection.html)
 class from [matplotlib](https://matplotlib.org/) and write a script
 called `draw_triangles.py` to do this:
 
-```python title="draw_triangles.py"
---8<-- "code/draw_triangles-v1.py"
+```python
+{{#include ../code/draw_triangles-v1.py}}
 ```
 
 Do you think this is a good way to organize the code? What do you think
@@ -46,8 +45,8 @@ In the script `draw_triangles.py` above, it would be a good idea to
 define a function called `draw_triangle` that draws a single triangle
 and re-use this function every time we need to draw a triangle:
 
-```python title="draw_triangles.py"
---8<-- "code/draw_triangles-v2.py"
+```python
+{{#include ../code/draw_triangles-v2.py}}
 ```
 
 ### Python scripts and modules
@@ -84,8 +83,8 @@ executable statements in a single module. When importing functions from
 this module, it is possible to avoid running other code by placing it
 under `if __name__ == "__main__"`:
 
-```python title="draw_triangles.py"
---8<-- "code/draw_triangles-v3.py"
+```python
+{{#include ../code/draw_triangles-v3.py}}
 ```
 
 When another module imports the module `draw_triangles` above, the code
@@ -126,14 +125,14 @@ geometry
 └── graphics.py
 ```
 
-```python title="graphics.py"
---8<-- "code/graphics.py"
+```python
+{{#include ../code/graphics.py}}
 ```
 
 Typically, the top-level executable code is put in a separate script
 which imports functions and data from other modules:
 
-```python title="draw_triangles.py"
+```python
 import graphics
 
 graphics.draw_triangle([
@@ -248,7 +247,7 @@ geometry
 
 A minimal `pyproject.toml` can include the following:
 
-```toml title="pyproject.toml"
+```toml
 [project]
 name = "geometry"
 version = "0.1.0"

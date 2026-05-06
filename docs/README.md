@@ -54,3 +54,4 @@ While many of the ideas are transferable, we cannot guarantee that.
 - [Getting Started](getting-started.md)
 - [Packaging](packaging.md)
 - [Testing](testing.md)
+- [Parametrization](parametrization.md)

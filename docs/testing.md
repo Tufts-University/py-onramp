@@ -1,11 +1,10 @@
 # Testing your code
 
-!!! note
-
-    This section is based heavily on Ned Batchelder's excellent article
-    and PyCon 2014 talk [Getting Started
-    Testing](https://nedbatchelder.com/text/test0.html)
-    and the corresponding chapter of Python 102.
+> [!NOTE]
+> This section is based heavily on Ned Batchelder's excellent article
+> and PyCon 2014 talk [Getting Started
+> Testing](https://nedbatchelder.com/text/test0.html)
+> and the corresponding chapter of Python 102.
 
 How can you write reusable and trustworthy code?
 
@@ -20,55 +19,27 @@ These seemingly unrelated questions all have the same answer, and it is
 
 ## Testing by example: differentiating a matrix solve
 
-For scalar $t$, consider the parametrized matrix equation
+For scalar \\(t\\), consider the parametrized matrix equation
 
-$$
-A(t)f = b
-$$
+\\[ A(t)f = b \\]
 
-and consider it's solution as a function of $t$, e.g. $f(t) = A(t)^{-1}b$.
-If $A(t)$ is differentiable and invertible for all $t$, then there's a cool
+and consider it's solution as a function of \\(t\\), e.g. \\(f(t) = A(t)^{-1}b\\).
+If \\(A(t)\\) is differentiable and invertible for all \\(t\\), then there's a cool
 matrix identity which tells us that
 
-$$
-\frac{d}{dt} A(t)^{-1} = -A(t)^{-1} A'(t) A(t)^{-1}.
-$$
+\\[ \frac{d}{dt} A(t)^{-1} = -A(t)^{-1} A'(t) A(t)^{-1}. \\]
 
 Hence
 
-$$
-\frac{d}{dt} f(t)
-= \frac{d}{dt}\!\left(A(t)^{-1} x\right)
-= -A(t)^{-1} A'(t) A(t)^{-1} x.
-$$
+\\[ \frac{d}{dt} f(t) = \frac{d}{dt}\\!\left(A(t)^{-1} x\right) = -A(t)^{-1} A'(t) A(t)^{-1} x. \\]
 
 For a concrete example, let
 
-$$
-A(t) =
-\begin{pmatrix}
-1+t & 0 \\
-0 & 1-t
-\end{pmatrix}.
-$$
+\\[ A(t) = \begin{pmatrix} 1+t & 0 \\\\ 0 & 1-t \end{pmatrix}. \\]
 
 Then
 
-$$
-f(x; t)
-=
-\begin{pmatrix}
-\dfrac{x_1}{1+t} \\
-\dfrac{x_2}{1-t}
-\end{pmatrix},
-\qquad
-\frac{d}{dt} f(x; t)
-=
-\begin{pmatrix}
--\dfrac{x_1}{(1+t)^2} \\
-\dfrac{x_2}{(1-t)^2}
-\end{pmatrix}.
-$$
+\\[ f(x; t) = \begin{pmatrix} \dfrac{x_1}{1+t} \\\\ \dfrac{x_2}{1-t} \end{pmatrix}, \qquad \frac{d}{dt} f(x; t) = \begin{pmatrix} -\dfrac{x_1}{(1+t)^2} \\\\ \dfrac{x_2}{(1-t)^2} \end{pmatrix}. \\]
 
 Here is an original implementation based on a hand derivation. 
 *However, I've made a critical error somewhere in here*!
@@ -76,12 +47,12 @@ There are bug(s) in this function that we need to find and fix.
 On your own, test the function for various inputs and compare the results
 obtained with expected output.
 
-```python title="matrix_derivative.py"
---8<-- "code/matrix_derivative_v1.py"
+```python
+{{#include ../code/matrix_derivative_v1.py}}
 ```
 
 - Which tests would you write first?
-- Which values of $x$ and $t$ make the expected answer easy to
+- Which values of \\(x\\) and \\(t\\) make the expected answer easy to
   compute by hand?
 - If the derivative is wrong, can the tests tell you which sign is
   wrong?
@@ -101,9 +72,9 @@ array([2., 3.])
 array([ 2., -3.])
 ```
 
-The value of $f(x; 0)$ is correct, since $A(0) = I$. But the
+The value of \\(f(x; 0)\\) is correct, since \\(A(0) = I\\). But the
 derivative is already suspicious: from the formula above we expect
-$(-2, 3)$, not $(2, -3)$.
+\\((-2, 3)\\), not \\((2, -3)\\).
 
 Interactive testing is useful, but it has the same limitations here as
 everywhere else. You have to remember what you tried, you have to rerun
@@ -114,8 +85,8 @@ results yourself.
 
 A much better approach is to put the checks into a script:
 
-```python title="test_matrix_derivative.py"
---8<-- "code/test_matrix_derivative_v1.py"
+```python
+{{#include ../code/test_matrix_derivative_v1.py}}
 ```
 
 Now we can run the same checks whenever we want:
@@ -140,8 +111,8 @@ false, Python raises an `AssertionError`:
 We can now replace printed output with a statement of the expected
 answer:
 
-```python title="test_matrix_derivative.py"
---8<-- "code/test_matrix_derivative_v2.py"
+```python
+{{#include ../code/test_matrix_derivative_v2.py}}
 ```
 
 If we run this script,
@@ -156,27 +127,23 @@ AssertionError
 ```
 
 we immediately learn that the claimed derivative is inconsistent with a
-simple hand calculation at $t = 0$.
+simple hand calculation at \\(t = 0\\).
 
 ### A brief aside: finite differences
 
 When testing a derivative, it is often useful to have a second way to
 compute it. One common option is a finite-difference approximation:
 
-$$
-\frac{d}{dt} f(x; t)
-\approx
-\frac{f(x; t+h) - f(x; t-h)}{2h}.
-$$
+\\[ \frac{d}{dt} f(x; t) \approx \frac{f(x; t+h) - f(x; t-h)}{2h}. \\]
 
-This is not an exact formula, but for a small value of $h$ it provides
+This is not an exact formula, but for a small value of \\(h\\) it provides
 an independent numerical check.
 
 Here is a script that compares the analytic derivative with both a
 hand-computed formula and a centered finite difference:
 
-```python title="test_matrix_derivative.py"
---8<-- "code/test_matrix_derivative_v3.py"
+```python
+{{#include ../code/test_matrix_derivative_v3.py}}
 ```
 
 ```console
@@ -201,8 +168,8 @@ Python is
 
 To use `pytest`, we rewrite each check as a separate test function:
 
-```python title="test_matrix_derivative.py"
---8<-- "code/test_matrix_derivative_v4.py"
+```python
+{{#include ../code/test_matrix_derivative_v4.py}}
 ```
 
 If you are already using SciPy, it also provides tools for derivative
@@ -255,16 +222,16 @@ returned.
 Now that we know how to run tests, which tests are actually useful for a
 derivative like this?
 
-Arbitrary choices of $x$ and $t$ are less helpful than cases that
+Arbitrary choices of \\(x\\) and \\(t\\) are less helpful than cases that
 make the structure of the mathematics visible. For this example, useful
 tests include:
 
-- $t = 0$, where $A(0) = I$ and the formula simplifies
-- A value such as $t = 0.2$, where the denominators are still simple
-  but not equal to $1$
+- \\(t = 0\\), where \\(A(0) = I\\) and the formula simplifies
+- A value such as \\(t = 0.2\\), where the denominators are still simple
+  but not equal to \\(1\\)
 - A finite-difference comparison, which checks the derivative without
   reusing the same algebraic derivation
-- Cases where one component of $x$ is zero, to isolate each term of
+- Cases where one component of \\(x\\) is zero, to isolate each term of
   the derivative separately
 
 These are the kinds of tests included in the `pytest` file above.
@@ -273,28 +240,24 @@ These are the kinds of tests included in the `pytest` file above.
 
 The tests suggest that the code used
 
-$$
-+A(t)^{-1} A'(t) A(t)^{-1} x
-$$
+\\[ +A(t)^{-1} A'(t) A(t)^{-1} x \\]
 
 instead of
 
-$$
--A(t)^{-1} A'(t) A(t)^{-1} x.
-$$
+\\[ -A(t)^{-1} A'(t) A(t)^{-1} x. \\]
 
 In other words, the hand derivation dropped the overall minus sign.
 
 Here is the corrected implementation:
 
-```python title="matrix_derivative.py"
---8<-- "code/matrix_derivative_v2.py"
+```python
+{{#include ../code/matrix_derivative_v2.py}}
 ```
 
 If we update the tests to import the corrected implementation, we obtain
 
-```python title="test_matrix_derivative.py"
---8<-- "code/test_matrix_derivative_v5.py"
+```python
+{{#include ../code/test_matrix_derivative_v5.py}}
 ```
 
 and the test runner now reports

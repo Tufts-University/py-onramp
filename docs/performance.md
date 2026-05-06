@@ -110,7 +110,7 @@ well-used implementations.
 For instance, it is easy to write a few lines of Python to read data
 from a `.csv` file into a Pandas DataFrame:
 
-```python title="my_csv.py"
+```python
 def read_csv(fname):
     with open(fname) as f:
         col_names = f.readline().rstrip().split(",")
@@ -293,8 +293,8 @@ As an example, consider numerically evaluating the derivative of a
 function using finite differences. A function that uses NumPy to do this
 might look like the following:
 
-```python title="derivatives.py"
---8<-- "code/derivatives.py"
+```python
+{{#include ../code/derivatives.py}}
 ```
 
 Below, we time the function for a grid of 10,000,000 points:
@@ -314,8 +314,8 @@ In [5]: %timeit dfdx(f, dx, y)
 
 Below is a function that is compiled using Numba to do the same task:
 
-```python title="derivatives_numba.py"
---8<-- "code/derivatives_numba.py"
+```python
+{{#include ../code/derivatives_numba.py}}
 ```
 
 We see much better performance for the same grid size:

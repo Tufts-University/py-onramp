@@ -1,9 +1,8 @@
 # Parametrizing a research script
 
-!!! note
-
-    TODO: Redo this with a repo that they can clone and work in..
-    This seciton generally needs work.
+> [!NOTE]
+> TODO: Redo this with a repo that they can clone and work in..
+> This seciton generally needs work.
 
 When you are experimenting, you change things constantly.
 
@@ -30,8 +29,8 @@ The runnable examples below use packages from this repository's
 `examples` dependency group, so the commands use `uv run --group
 examples ...`.
 
-```python title="dummy_train.py"
---8<-- "code/dummy_train.py"
+```python
+{{#include ../code/dummy_train.py}}
 ```
 
 There is no single best way to parametrize a script. More machinery can
@@ -41,9 +40,8 @@ with the smallest tool that fits the current problem.
 
 ## Stage 0: Do nothing, edit the file directly
 
-!!! note 
-    
-    "It is not enough to do nothing. One must also be doing nothing." - Zhuang Zhou 
+> [!NOTE]
+> "It is not enough to do nothing. One must also be doing nothing." - Zhuang Zhou
 
 The original script is useful because it is obvious.
 
@@ -83,8 +81,8 @@ class ExperimentConfig:
     output_dir: str = "outputs/default"
 ```
 
-```python title="argparse_main.py"
---8<-- "code/dummy_train/argparse_main.py"
+```python
+{{#include ../code/dummy_train/argparse_main.py}}
 ```
 
 The flow is:
@@ -122,12 +120,12 @@ loader is in `code/dummy_train/toml_main.py`. The script reads the TOML
 file and constructs the same `ExperimentConfig` dataclass used in the
 `argparse` example.
 
-```toml title="config.toml"
---8<-- "code/dummy_train/config.toml"
+```toml
+{{#include ../code/dummy_train/config.toml}}
 ```
 
-```python title="toml_main.py"
---8<-- "code/dummy_train/toml_main.py"
+```python
+{{#include ../code/dummy_train/toml_main.py}}
 ```
 
 Typical usage:
@@ -145,12 +143,11 @@ This buys you two things at once:
 The mental model is still simple: load a file and pass the resulting
 dataclass into `train(config)`.
 
-!!! note
-
-    Something that you might was is the ability to pass a configuration
-    file, along with CLI overrides. [I've implemented this in a gist,
-    that you can drop
-    in](https://gist.github.com/abhijit-c/b18acfce4b86c2e5e11983463550fd6f).
+> [!NOTE]
+> Something that you might was is the ability to pass a configuration
+> file, along with CLI overrides. [I've implemented this in a gist,
+> that you can drop
+> in](https://gist.github.com/abhijit-c/b18acfce4b86c2e5e11983463550fd6f).
 
 ## Stage 3: Hydra
 
@@ -165,16 +162,16 @@ For this example, the Hydra setup is intentionally small:
 - `code/dummy_train/conf/config.yaml` is the root config
 - `code/dummy_train/conf/experiment/default.yaml` holds the experiment values
 
-```python title="hydra_main.py"
---8<-- "code/dummy_train/hydra_main.py"
+```python
+{{#include ../code/dummy_train/hydra_main.py}}
 ```
 
-```yaml title="conf/config.yaml"
---8<-- "code/dummy_train/conf/config.yaml"
+```yaml
+{{#include ../code/dummy_train/conf/config.yaml}}
 ```
 
-```yaml title="conf/experiment/default.yaml"
---8<-- "code/dummy_train/conf/experiment/default.yaml"
+```yaml
+{{#include ../code/dummy_train/conf/experiment/default.yaml}}
 ```
 
 Hydra still ends in the same place as the other stages: a populated

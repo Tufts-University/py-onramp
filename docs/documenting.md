@@ -92,8 +92,8 @@ following:
 
 Here is a simple example of this in action:
 
-```python title="flip_list-v1.py"
---8<-- "code/flip_list-v1.py"
+```python
+{{#include ../code/flip_list-v1.py}}
 ```
 
 NumPy's [documentation
@@ -106,8 +106,8 @@ In addition to the sections above, your documentation can also contain
 runnable tests. This is possible using the
 [doctest](https://docs.python.org/3/library/doctest.html) module.
 
-```python title="flip_list.py"
---8<-- "code/flip_list-v2.py"
+```python
+{{#include ../code/flip_list-v2.py}}
 ```
 
 You can tell `pytest` to run doctests as well as other tests using the

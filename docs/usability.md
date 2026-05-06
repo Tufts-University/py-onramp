@@ -157,7 +157,7 @@ the following will create the proper executable on both Windows and Unix
 systems and put it in a place that is readily callable, that is, on the
 user's `PATH`.
 
-```python title="setup.py"
+```python
 # use "entry_points" to point to function and setuptools
 # will create executables on your behalf.
 setup(
@@ -194,7 +194,7 @@ non-zero status indicates some specific error has occurred.
 The following shows a basic usage of `argparse` and how to define your
 `main` function.
 
-```python title="do_science.py"
+```python
 import argparse
 
 parser = argparse.ArgumentParser(

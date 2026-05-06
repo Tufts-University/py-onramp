@@ -2,8 +2,8 @@
 
 We've embarked. It's time to run some code!
 
-```python title="hello_matplotlib.py"
---8<-- "code/hello_matplotlib.py"
+```python
+{{#include ../code/hello_matplotlib.py}}
 ```
 
 We run it with python and...
@@ -36,9 +36,8 @@ Historically, there have many tools for this task but, today, I highly recommend
 
 Follow the official installation instructions for your platform:
 
-!!! note
-
-    [Install `uv` here: https://docs.astral.sh/uv/getting-started/installation/](https://docs.astral.sh/uv/getting-started/installation/)
+> [!NOTE]
+> [Install `uv` here: https://docs.astral.sh/uv/getting-started/installation/](https://docs.astral.sh/uv/getting-started/installation/)
 
 After installation, confirm that it is available:
 
@@ -87,7 +86,7 @@ $ uv add numpy matplotlib
 This updates your `pyproject.toml`, refreshes the lockfile, and syncs the
 project environment.
 
-```toml title="pyproject.toml"
+```toml
 [project]
 name = "my-project"
 version = "0.1.0"
@@ -175,4 +174,4 @@ $ uv add numpy matplotlib
 $ uv run hello_matplotlib.py # Having obtained this file somehow
 ```
 
-![Hello Matplotlib!](images/hello_matplotlib.png){ width="60%" }
+<img src="images/hello_matplotlib.png" alt="Hello Matplotlib!" width="60%">

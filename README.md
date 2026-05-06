@@ -4,16 +4,16 @@ An onramp to the modern data / scientific python workflow.
 
 ## Building The Docs Site Locally
 
-Install project dependencies with `uv`, including all dependency groups:
+Install the project dependencies you need with `uv`:
 
 ```bash
 uv sync --all-groups
 ```
 
-Then build the docs site locally with MkDocs:
+Then build the docs site locally with `mdbook`:
 
 ```bash
-uv run mkdocs build --strict
+mdbook build
 ```
 
 This writes the generated site to `site/`. Use this when you want to error
@@ -21,7 +21,7 @@ check if everything builds cleanly. Alternatively, you can serve the docs
 locally during development:
 
 ```bash
-uv run mkdocs serve
+mdbook serve
 ```
 
 Serving starts a local development server and rebuilds automatically as you
@@ -35,7 +35,7 @@ artifacts should not be committed or pushed.
 
 ### Must Have
 
-- [x] `docs/index.md`
+- [x] `docs/README.md`
   - [x] Replace the Anaconda-first setup guidance with a `uv`-first workflow.
   - [x] Add a short "getting started" path for local development: install Python, create/sync the environment, and run examples with `uv run`.
 - [x] `docs/packaging.md`
