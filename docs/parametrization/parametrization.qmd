@@ -1,0 +1,501 @@
+# Parametrizing a research script
+
+> [!NOTE]
+> TODO: Redo this with a repo that they can clone and work in..
+> This seciton generally needs work.
+
+When you are experimenting, you change things constantly.
+
+Maybe you want to try a wider network, a different learning rate, a
+larger batch size, or a new random seed. At first, the simplest thing is
+often to open the file and edit a few numbers by hand. That is a
+perfectly reasonable place to start.
+
+But eventually you want more than that:
+
+- you want to rerun an old experiment exactly
+- you want to compare several runs without repeatedly editing the file
+- you want your commands to record what changed
+
+This section uses a fully dummy script, `code/dummy_train.py`, as the
+baseline example.
+
+Nothing here is about machine learning. The point is to show how
+different parametrization styles all feed the same
+`ExperimentConfig` dataclass and eventually call the same
+`train(config)` function.
+
+The runnable examples below use packages from this repository's
+`examples` dependency group, so the commands use `uv run --group
+examples ...`.
+
+```{.python filename="dummy_train.py"}
+"""A deliberately tiny script with hard-coded hyperparameters.
+
+This is the "edit the file directly" baseline for the parametrization docs.
+"""
+
+
+def train(width: int, depth: int, lr: float, n_epochs: int, batch_size: int) -> None:
+    """Placeholder training function used only for the docs."""
+    print("Pretend we trained a model with:")
+    print(f"  width={width}")
+    print(f"  depth={depth}")
+    print(f"  lr={lr}")
+    print(f"  n_epochs={n_epochs}")
+    print(f"  batch_size={batch_size}")
+
+
+if __name__ == "__main__":
+    WIDTH = 64
+    DEPTH = 2
+    LR = 3e-3
+    N_EPOCHS = 200
+    BATCH_SIZE = 256
+
+    train(WIDTH, DEPTH, LR, N_EPOCHS, BATCH_SIZE)
+```
+
+There is no single best way to parametrize a script. More machinery can
+make experiments more reproducible, but it also makes the codebase more
+abstract and harder for a newcomer to follow. A good rule is to start
+with the smallest tool that fits the current problem.
+
+## Stage 0: Do nothing, edit the file directly
+
+> [!NOTE]
+> "It is not enough to do nothing. One must also be doing nothing." - Zhuang Zhou
+
+The original script is useful because it is obvious.
+
+If you are still understanding the script and only changing one or two
+values occasionally, editing the file may be the right choice. There is
+no parser to debug, no config format to learn, and no hidden indirection.
+
+The downside is that your experiment settings now live in your edit
+history rather than in a command or a config file. That becomes awkward
+once you want to compare multiple runs.
+
+## Stage 1: command line arguments with `argparse`
+
+The first step up is usually to expose the most important
+hyper-parameters as command line flags. Python's standard library
+already includes [`argparse`](https://docs.python.org/3/library/argparse.html),
+so this adds very little machinery.
+
+In this repository, the `argparse` version lives in
+`code/dummy_train/argparse_main.py`. The shared dataclass and
+placeholder `train(config)` function live in `code/dummy_train/common.py`,
+so that each parametrization style can focus on how parameters are
+collected.
+
+The dataclass itself looks like this:
+
+```python
+@dataclass
+class ExperimentConfig:
+    """A small bundle of hyperparameters passed through the example flows."""
+    width: int = 64
+    depth: int = 2
+    lr: float = 3e-3
+    n_epochs: int = 200
+    batch_size: int = 256
+    seed: int = 0
+    output_dir: str = "outputs/default"
+```
+
+```{.python filename="argparse_main.py"}
+"""Pass hyperparameters from argparse into a dataclass."""
+
+from __future__ import annotations
+
+import argparse
+from dataclasses import asdict, dataclass
+
+
+@dataclass
+class ExperimentConfig:
+    """A small bundle of hyperparameters passed through the example flows."""
+
+    width: int = 64
+    depth: int = 2
+    lr: float = 3e-3
+    n_epochs: int = 200
+    batch_size: int = 256
+    seed: int = 0
+    output_dir: str = "outputs/default"
+
+
+def validate_config(config: ExperimentConfig) -> None:
+    """Keep the examples honest without adding much machinery."""
+    if config.width < 1:
+        raise ValueError(f"width must be at least 1, got {config.width=}")
+    if config.depth < 1:
+        raise ValueError(f"depth must be at least 1, got {config.depth=}")
+    if config.lr <= 0.0:
+        raise ValueError(f"lr must be positive, got {config.lr=}")
+    if config.n_epochs < 1:
+        raise ValueError(f"n_epochs must be at least 1, got {config.n_epochs=}")
+    if config.batch_size < 1:
+        raise ValueError(f"batch_size must be at least 1, got {config.batch_size=}")
+
+
+def train(config: ExperimentConfig) -> None:
+    """Placeholder training entrypoint used by the parametrization examples."""
+    validate_config(config)
+    print("Resolved experiment config:")
+    for name, value in asdict(config).items():
+        print(f"  {name}: {value}")
+    print()
+    print("def train(config: ExperimentConfig) is intentionally a placeholder.")
+    print("The example is about parameter flow, not model training.")
+
+
+def build_parser() -> argparse.ArgumentParser:
+    """Build the command-line interface for the simple argparse example."""
+    parser = argparse.ArgumentParser(
+        prog="argparse_main.py",
+        description="Build an ExperimentConfig from command-line arguments.",
+    )
+    parser.add_argument(
+        "--width", type=int, default=64, help="Hidden layer width in the dummy model."
+    )
+    parser.add_argument(
+        "--depth", type=int, default=2, help="Number of hidden layers."
+    )
+    parser.add_argument("--lr", type=float, default=3e-3, help="Learning rate.")
+    parser.add_argument(
+        "--n-epochs", type=int, default=200, help="Number of training epochs."
+    )
+    parser.add_argument(
+        "--batch-size", type=int, default=256, help="Mini-batch size."
+    )
+    parser.add_argument("--seed", type=int, default=0, help="Random seed.")
+    parser.add_argument(
+        "--output-dir",
+        default="outputs/argparse",
+        help="Directory name recorded in the config.",
+    )
+    return parser
+
+
+def main() -> int:
+    """Parse CLI arguments, build the config, and hand it to train()."""
+    args = build_parser().parse_args()
+    config = ExperimentConfig(
+        width=args.width,
+        depth=args.depth,
+        lr=args.lr,
+        n_epochs=args.n_epochs,
+        batch_size=args.batch_size,
+        seed=args.seed,
+        output_dir=args.output_dir,
+    )
+    train(config)
+    return 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())
+```
+
+The flow is:
+
+- parse a few flags
+- build an `ExperimentConfig`
+- pass that dataclass into `train(config)`
+
+If you run it, the script just prints the resolved config and a message
+that the training function is intentionally a placeholder.
+
+Run it like this:
+
+```bash
+$ uv run --group examples python code/dummy_train/argparse_main.py --n-epochs 50 --lr 1e-3 --width 128
+```
+
+This approach is a good fit when:
+
+- there are only a handful of parameters worth changing often
+- you want `--help` output immediately
+- each run is mostly a one-off command
+
+The tradeoff is that long commands can get noisy. Once you find yourself
+copying and pasting a large command and changing only one value each
+time, a config file often becomes easier to manage.
+
+## Stage 2: a TOML config
+
+The next step is to put your default experiment settings in a config
+file instead of hard-coding them in the script.
+
+Here, the defaults live in `code/dummy_train/config.toml`, and the
+loader is in `code/dummy_train/toml_main.py`. The script reads the TOML
+file and constructs the same `ExperimentConfig` dataclass used in the
+`argparse` example.
+
+```toml
+[experiment]
+width = 64
+depth = 2
+lr = 0.003
+n_epochs = 200
+batch_size = 256
+seed = 0
+output_dir = "outputs/toml"
+```
+
+```{.python filename="toml_main.py"}
+"""Build the dataclass from a TOML config."""
+
+from __future__ import annotations
+
+import argparse
+import tomllib
+from dataclasses import asdict, dataclass
+from pathlib import Path
+
+
+@dataclass
+class ExperimentConfig:
+    """A small bundle of hyperparameters passed through the example flows."""
+
+    width: int = 64
+    depth: int = 2
+    lr: float = 3e-3
+    n_epochs: int = 200
+    batch_size: int = 256
+    seed: int = 0
+    output_dir: str = "outputs/default"
+
+
+def validate_config(config: ExperimentConfig) -> None:
+    """Keep the examples honest without adding much machinery."""
+    if config.width < 1:
+        raise ValueError(f"width must be at least 1, got {config.width=}")
+    if config.depth < 1:
+        raise ValueError(f"depth must be at least 1, got {config.depth=}")
+    if config.lr <= 0.0:
+        raise ValueError(f"lr must be positive, got {config.lr=}")
+    if config.n_epochs < 1:
+        raise ValueError(f"n_epochs must be at least 1, got {config.n_epochs=}")
+    if config.batch_size < 1:
+        raise ValueError(f"batch_size must be at least 1, got {config.batch_size=}")
+
+
+def train(config: ExperimentConfig) -> None:
+    """Placeholder training entrypoint used by the parametrization examples."""
+    validate_config(config)
+    print("Resolved experiment config:")
+    for name, value in asdict(config).items():
+        print(f"  {name}: {value}")
+    print()
+    print("def train(config: ExperimentConfig) is intentionally a placeholder.")
+    print("The example is about parameter flow, not model training.")
+
+
+DEFAULT_CONFIG_PATH = Path(__file__).with_name("config.toml")
+
+
+def build_parser() -> argparse.ArgumentParser:
+    """Build the CLI for the TOML example."""
+    parser = argparse.ArgumentParser(
+        prog="toml_main.py",
+        description="Build an ExperimentConfig from a TOML file.",
+    )
+    parser.add_argument(
+        "--config",
+        type=Path,
+        default=DEFAULT_CONFIG_PATH,
+        help="Path to the TOML configuration file.",
+    )
+    return parser
+
+
+def load_config(path: Path) -> ExperimentConfig:
+    """Load experiment settings from TOML."""
+    with path.open("rb") as handle:
+        data = tomllib.load(handle)
+    experiment = data.get("experiment", {})
+    return ExperimentConfig(**experiment)
+
+
+def main() -> int:
+    """Load a config file and hand the result to train()."""
+    args = build_parser().parse_args()
+    config = load_config(args.config)
+    train(config)
+    return 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())
+```
+
+Typical usage:
+
+```bash
+$ uv run --group examples python code/dummy_train/toml_main.py
+$ uv run --group examples python code/dummy_train/toml_main.py --config code/dummy_train/config.toml
+```
+
+This buys you two things at once:
+
+- the defaults are written down in a stable, readable file
+- the script stays very simple
+
+The mental model is still simple: load a file and pass the resulting
+dataclass into `train(config)`.
+
+> [!NOTE]
+> Something that you might was is the ability to pass a configuration
+> file, along with CLI overrides. [I've implemented this in a gist,
+> that you can drop
+> in](https://gist.github.com/abhijit-c/b18acfce4b86c2e5e11983463550fd6f).
+
+## Stage 3: Hydra
+
+[Hydra](https://hydra.cc/) is the industry standard tooling for this type of
+thing.
+It's particularly useful when you have many related experiments and you want
+configuration to become a first-class part of the workflow.
+
+For this example, the Hydra setup is intentionally small:
+
+- `code/dummy_train/hydra_main.py` is the entry point
+- `code/dummy_train/conf/config.yaml` is the root config
+- `code/dummy_train/conf/experiment/default.yaml` holds the experiment values
+
+```{.python filename="hydra_main.py"}
+"""Build the dataclass from Hydra-managed configuration."""
+
+from __future__ import annotations
+
+from dataclasses import asdict, dataclass
+
+import hydra
+from hydra.core.config_store import ConfigStore
+from omegaconf import OmegaConf
+
+
+@dataclass
+class ExperimentConfig:
+    """A small bundle of hyperparameters passed through the example flows."""
+
+    width: int = 64
+    depth: int = 2
+    lr: float = 3e-3
+    n_epochs: int = 200
+    batch_size: int = 256
+    seed: int = 0
+    output_dir: str = "outputs/default"
+
+
+def validate_config(config: ExperimentConfig) -> None:
+    """Keep the examples honest without adding much machinery."""
+    if config.width < 1:
+        raise ValueError(f"width must be at least 1, got {config.width=}")
+    if config.depth < 1:
+        raise ValueError(f"depth must be at least 1, got {config.depth=}")
+    if config.lr <= 0.0:
+        raise ValueError(f"lr must be positive, got {config.lr=}")
+    if config.n_epochs < 1:
+        raise ValueError(f"n_epochs must be at least 1, got {config.n_epochs=}")
+    if config.batch_size < 1:
+        raise ValueError(f"batch_size must be at least 1, got {config.batch_size=}")
+
+
+def train(config: ExperimentConfig) -> None:
+    """Placeholder training entrypoint used by the parametrization examples."""
+    validate_config(config)
+    print("Resolved experiment config:")
+    for name, value in asdict(config).items():
+        print(f"  {name}: {value}")
+    print()
+    print("def train(config: ExperimentConfig) is intentionally a placeholder.")
+    print("The example is about parameter flow, not model training.")
+
+
+cs = ConfigStore.instance()
+cs.store(name="experiment_config", node=ExperimentConfig)
+
+
+@hydra.main(version_base=None, config_path="conf", config_name="config")
+def main(cfg) -> None:
+    """Convert the Hydra config into the shared dataclass and hand it to train()."""
+    config = ExperimentConfig(**OmegaConf.to_container(cfg.experiment, resolve=True))
+    train(config)
+
+
+if __name__ == "__main__":
+    main()
+```
+
+```yaml
+defaults:
+  - experiment: default
+  - _self_
+
+hydra:
+  output_subdir: null
+  run:
+    dir: .
+```
+
+```yaml
+width: 64
+depth: 2
+lr: 0.003
+n_epochs: 200
+batch_size: 256
+seed: 0
+output_dir: outputs/hydra
+```
+
+Hydra still ends in the same place as the other stages: a populated
+`ExperimentConfig` dataclass passed into the placeholder training
+function.
+
+Typical usage:
+
+```bash
+$ uv run --group examples python code/dummy_train/hydra_main.py
+$ uv run --group examples python code/dummy_train/hydra_main.py experiment.lr=1e-3 experiment.width=128
+```
+
+Hydra starts to pay off when:
+
+- experiment configurations are numerous enough that you want them in a directory tree
+- different groups of settings naturally belong together
+- command-line overrides should work on nested config values
+
+But Hydra is not automatically better than TOML or `argparse`.
+It adds concepts: config groups, composition, and a framework-specific
+override syntax. That extra power is useful only if the project is large
+enough to benefit from it. For a single local script, Hydra may be more
+structure than you need.
+
+## Looking ahead: Optuna
+
+The three approaches above are all about **manual** parametrization:
+they make it easier for a human to choose hyper-parameters and feed them
+into the same script in a controlled way.
+
+Hyperparameter tuning, through something like [Optuna](https://optuna.org/),
+addresses a different problem. Instead of choosing each learning rate or width
+by hand, Optuna can search over candidate values automatically and track which
+settings worked best.
+
+## Comparing the approaches
+
+| Approach | Best for | Main benefit | Main cost |
+| --- | --- | --- | --- |
+| Edit the file | Very small, local experiments | Almost no abstraction | Hard to reproduce and compare runs |
+| `argparse` | A few parameters changed often | Simple path from flags to a dataclass | Long commands become repetitive |
+| TOML | Stable defaults written down in a file | File-based defaults with a simple loader | Another config format to maintain |
+| Hydra | Larger experiment trees | Structured configs and powerful overrides | More concepts and more complexity |
+
+The important point is not to "graduate" to the most sophisticated tool
+as quickly as possible. The right level of parametrization is the one
+that reduces friction for your current experiments without making the
+code harder to understand than it needs to be.

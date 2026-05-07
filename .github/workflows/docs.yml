@@ -22,19 +22,20 @@ jobs:
       - name: Check out repository
         uses: actions/checkout@v4
 
-      - name: Set up Rust
-        uses: dtolnay/rust-toolchain@stable
-        with:
-          toolchain: stable
+      - name: Set up Quarto
+        uses: quarto-dev/quarto-actions/setup@v2
+
+      - name: Set up uv
+        uses: astral-sh/setup-uv@v3
+
+      - name: Install Python dependencies
+        run: uv sync --group docs --group examples
+
+      - name: Render documentation
+        run: uv run quarto render
 
       - name: Configure GitHub Pages
         uses: actions/configure-pages@v5
-
-      - name: Install mdBook tooling
-        run: cargo install mdbook --locked
-
-      - name: Build documentation
-        run: mdbook build
 
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v3

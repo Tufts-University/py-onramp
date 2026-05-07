@@ -11,7 +11,7 @@ x = 1.234
 print("The value of x is {0:0.4f}.".format(x))
 ```
 
-```text
+```bash
 The value of x is 1.2340.
 ```
 
@@ -83,7 +83,7 @@ log.error("unrecoverable issue")
 log.critical("panic!")
 ```
 
-```text
+```bash
 INFO 2018-07-24 09:41:56,683 ProjectName - notification of milestone
 WARNING 2018-07-24 09:41:56,835 ProjectName - non-standard behavior
 ERROR 2018-07-24 09:41:57,103 ProjectName - unrecoverable issue
@@ -227,12 +227,12 @@ def main() -> int:
 After the package is installed, `pip install my_package ...`, you will
 be able to call the script:
 
-```text
+```bash
 > do_science
 usage: do_science [-h] [-d] input_file
 ```
 
-```text
+```bash
 > do_science --help
 usage: do_science [-h] [-d] input_file
 

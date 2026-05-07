@@ -2,7 +2,7 @@
 
 This tutorial covers topics that are essential for research in scientific
 computing and data analysis using Python, but are typically *not* covered in an
-introductory course. 
+introductory course.
 These are the things you *need* to know if you are writing software that
 meets any of the following criteria:
 
@@ -51,8 +51,11 @@ While many of the ideas are transferable, we cannot guarantee that.
 
 ## Contents
 
-- [The Command Line](command-line.md)
-- [Getting Started](getting-started.md)
-- [Packaging](packaging.md)
-- [Testing](testing.md)
-- [Parametrization](parametrization.md)
+- [The Command Line](docs/command-line/command-line.qmd)
+- [Getting Started](docs/getting-started/getting-started.qmd)
+- [Packaging](docs/packaging/packaging.qmd)
+- [Testing](docs/testing/testing.qmd)
+- [Parametrization](docs/parametrization/parametrization.qmd)
+- [Documenting](docs/documenting/documenting.qmd)
+- [Performance](docs/performance/performance.qmd)
+- [Usability](docs/usability/usability.qmd)

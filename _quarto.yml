@@ -1,0 +1,23 @@
+project:
+  type: book
+  output-dir: site
+
+book:
+  title: "py-onramp"
+  description: "An onramp to the modern data and scientific Python workflow."
+  repo-url: "https://github.com/Tufts-University/py-onramp"
+  repo-actions: [edit]
+  chapters:
+    - index.qmd
+    - docs/command-line/command-line.qmd
+    - docs/getting-started/getting-started.qmd
+    - docs/packaging/packaging.qmd
+    - docs/testing/testing.qmd
+    - docs/parametrization/parametrization.qmd
+
+format:
+  html:
+    theme: darkly
+
+execute:
+  freeze: auto

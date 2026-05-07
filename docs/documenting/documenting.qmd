@@ -92,8 +92,10 @@ following:
 
 Here is a simple example of this in action:
 
-```python
-{{#include ../code/flip_list-v1.py}}
+```{python}
+#| echo: true
+#| eval: false
+#| file: flip_list-v1.py
 ```
 
 NumPy's [documentation
@@ -106,14 +108,16 @@ In addition to the sections above, your documentation can also contain
 runnable tests. This is possible using the
 [doctest](https://docs.python.org/3/library/doctest.html) module.
 
-```python
-{{#include ../code/flip_list-v2.py}}
+```{python}
+#| echo: true
+#| eval: false
+#| file: flip_list-v2.py
 ```
 
 You can tell `pytest` to run doctests as well as other tests using the
 `--doctest-modules` switch:
 
-```console
+```bash
 $ pytest --doctest-modules flip_list.py
 
 collected 1 item

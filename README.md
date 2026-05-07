@@ -7,13 +7,13 @@ An onramp to the modern data / scientific python workflow.
 Install the project dependencies you need with `uv`:
 
 ```bash
-uv sync --all-groups
+uv sync --group docs --group examples
 ```
 
-Then build the docs site locally with `mdbook`:
+Then build the docs site locally with Quarto:
 
 ```bash
-mdbook build
+uv run quarto render
 ```
 
 This writes the generated site to `site/`. Use this when you want to error
@@ -21,7 +21,7 @@ check if everything builds cleanly. Alternatively, you can serve the docs
 locally during development:
 
 ```bash
-mdbook serve
+uv run quarto preview
 ```
 
 Serving starts a local development server and rebuilds automatically as you

@@ -35,7 +35,7 @@ Three commands let you find your bearings and move around:
 Here is a typical session.
 Start by checking where you are and what is there:
 
-```console
+```bash
 $ pwd
 /home/user
 $ ls
@@ -44,7 +44,7 @@ Desktop  Documents  Downloads  Pictures
 
 Move into a folder:
 
-```console
+```bash
 $ cd Documents
 $ ls
 research  notes.txt
@@ -52,7 +52,7 @@ research  notes.txt
 
 Go one level back up with `cd ..`:
 
-```console
+```bash
 $ cd ..
 $ ls
 Desktop  Documents  Downloads  Pictures
@@ -60,7 +60,7 @@ Desktop  Documents  Downloads  Pictures
 
 You can also jump straight to a path deeper in the tree:
 
-```console
+```bash
 $ cd Documents/research
 $ ls
 data  analysis.py
@@ -78,19 +78,19 @@ If you do not have `git` installed yet, get it from
 also installs Git Bash on Windows.
 Once installed, to get this tutorial's code and materials, run:
 
-```console
+```bash
 $ git clone https://github.com/Tufts-University/py-onramp
 ```
 
 This creates a new folder called `py-onramp` in your current directory.
 Step into it:
 
-```console
+```bash
 $ cd py-onramp
 $ ls
 code  docs  README.md
 ```
 
 You now have everything you need locally.
-Head to [Getting Started](getting-started.md) to set up your Python environment
+Head to [Getting Started](../getting-started/getting-started.qmd) to set up your Python environment
 and run some code.

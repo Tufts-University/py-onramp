@@ -5,13 +5,15 @@
 
 We've embarked. It's time to run some code!
 
-```python
-{{#include ../code/hello_matplotlib.py}}
+```{python}
+#| echo: true
+#| eval: false
+#| file: hello_matplotlib.py
 ```
 
 We run it with python and...
-```console
-> python hello_matplotlib.py
+```bash
+$ python hello_matplotlib.py
 Traceback (most recent call last):
   File "/home/lotus/Repositories/py-onramp/code/hello_matplotlib.py", line 2, in <module>
     import matplotlib.pyplot as plt
@@ -44,20 +46,20 @@ Follow the official installation instructions for your platform:
 
 After installation, confirm that it is available:
 
-```console
+```bash
 $ uv --version
 uv 0.9.5
 ```
 
 ## Create a new project
 
-Usually, we begin with a fresh directory. 
+Usually, we begin with a fresh directory.
 `uv` itself can be used to create this directory, and it'll package
 all the structures it needs to record metadata and dependencies.
 
 To create a simple script-oriented project:
 
-```console
+```bash
 $ uv init my-project
 $ cd my-project
 ```
@@ -67,7 +69,7 @@ and a starter Python file.
 
 If you already made the directory, initialize it in place:
 
-```console
+```bash
 $ mkdir my-project
 $ cd my-project
 $ uv init
@@ -75,14 +77,14 @@ $ uv init
 
 If you know you are building a reusable library or package, `uv` also supports
 library-oriented initialization. We defer the details of package layout and
-build configuration to [Packaging](packaging.md), since that is where concepts
+build configuration to [Packaging](../packaging/packaging.qmd), since that is where concepts
 like module structure, installable projects, and publishing belong.
 
 ## Add dependencies
 
 Once the project exists, add the packages you need with `uv add`:
 
-```console
+```bash
 $ uv add numpy matplotlib
 ```
 
@@ -105,7 +107,7 @@ dependencies = [
 If you clone an existing project that already has a `pyproject.toml` and
 `uv.lock`, install everything recorded there with:
 
-```console
+```bash
 $ uv sync
 ```
 
@@ -115,14 +117,14 @@ That is the usual command for "make my environment match this project".
 
 Use `uv run` to execute code inside the project's environment:
 
-```console
+```bash
 $ uv run main.py
 ```
 
 You can also run tools this way. For example, if you installed `pytest` (which
 we will discuss later), you could run the corresponding CLI tool as
 
-```console
+```bash
 $ uv run pytest
 ```
 
@@ -157,24 +159,24 @@ What matters early on is the workflow:
 
 Here is the shortest useful workflow for a new project:
 
-```console
+```bash
 $ uv python install
 $ uv init my-project
 $ cd my-project
-$ uv add dep1 dep2 
+$ uv add dep1 dep2
 $ uv run main.py
 ```
 
 For more on structuring that project as an installable package or library, move
-on to [Packaging](packaging.md).
+on to [Packaging](../packaging/packaging.qmd).
 
 As for our original example: Running
 
-```console
+```bash
 $ uv init my-project
 $ cd my-project
 $ uv add numpy matplotlib
 $ uv run hello_matplotlib.py # Having obtained this file somehow
 ```
 
-<img src="images/hello_matplotlib.png" alt="Hello Matplotlib!" width="60%">
+![Hello Matplotlib!](images/hello_matplotlib.png){width=60%}

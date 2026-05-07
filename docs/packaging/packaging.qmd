@@ -12,15 +12,17 @@ that includes *you* a few weeks from now.
 
 We want to write a Python program that draws triangles:
 
-<img src="images/triangle.png" alt="Triangle example" width="60%">
+![Triangle example](images/triangle.png){width=60%}
 
 We use the
 [Polygon](https://matplotlib.org/gallery/api/patch_collection.html)
 class from [matplotlib](https://matplotlib.org/) and write a script
 called `draw_triangles.py` to do this:
 
-```python
-{{#include ../code/draw_triangles-v1.py}}
+```{python}
+#| echo: true
+#| eval: false
+#| file: draw_triangles-v1.py
 ```
 
 Do you think this is a good way to organize the code? What do you think
@@ -45,8 +47,10 @@ In the script `draw_triangles.py` above, it would be a good idea to
 define a function called `draw_triangle` that draws a single triangle
 and re-use this function every time we need to draw a triangle:
 
-```python
-{{#include ../code/draw_triangles-v2.py}}
+```{python}
+#| echo: true
+#| eval: false
+#| file: draw_triangles-v2.py
 ```
 
 ### Python scripts and modules
@@ -58,7 +62,7 @@ A *script* is a module that is intended to be run by the Python
 interpreter. For example, the script `draw_triangles.py` can be run from
 the command line using the command:
 
-```console
+```bash
 $ python draw_triangles.py
 ```
 
@@ -83,8 +87,10 @@ executable statements in a single module. When importing functions from
 this module, it is possible to avoid running other code by placing it
 under `if __name__ == "__main__"`:
 
-```python
-{{#include ../code/draw_triangles-v3.py}}
+```{python}
+#| echo: true
+#| eval: false
+#| file: draw_triangles-v3.py
 ```
 
 When another module imports the module `draw_triangles` above, the code
@@ -104,7 +110,7 @@ is more than a handful of lines long?
 
 ### A single module
 
-```text
+```bash
 geometry
 └── draw_triangles.py
 ```
@@ -119,14 +125,16 @@ recommended, but as the size or scope of the project grows, it may be
 necessary to divide code into different modules, each containing related
 data and functionality.
 
-```text
+```bash
 geometry
 ├── draw_triangles.py
 └── graphics.py
 ```
 
-```python
-{{#include ../code/graphics.py}}
+```{python}
+#| echo: true
+#| eval: false
+#| file: graphics.py
 ```
 
 Typically, the top-level executable code is put in a separate script
@@ -162,7 +170,7 @@ as other packages, sometimes referred to as *sub-packages*.
 
 For example, `geometry` below is a package containing various modules:
 
-```text
+```bash
 draw_triangles.py
 geometry
 ├── graphics.py
@@ -227,7 +235,7 @@ A better way is to turn your code into a proper project with
 [`uv`](https://docs.astral.sh/uv/). For a reusable library, `uv` can
 create the basic layout for you:
 
-```console
+```bash
 $ uv init --lib geometry
 $ cd geometry
 ```
@@ -237,7 +245,7 @@ directory for your importable code, and a local project environment that
 `uv` can manage for you. A small library project might then look like
 this:
 
-```text
+```bash
 pyproject.toml
 README.md
 geometry
@@ -258,7 +266,7 @@ requires-python = ">=3.12"
 
 If the project has dependencies, add them with `uv add`:
 
-```console
+```bash
 $ uv add matplotlib
 ```
 
@@ -267,14 +275,14 @@ project environment.
 
 To create or refresh the environment for the project, run:
 
-```console
+```bash
 $ uv sync
 ```
 
 Once the project environment exists, you can run Python or other tools
 inside it with `uv run`:
 
-```console
+```bash
 $ uv run python
 ```
 
